@@ -1,0 +1,7 @@
+{
+  "name": "YAWT",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
