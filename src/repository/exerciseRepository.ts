@@ -9,7 +9,7 @@ export class ExerciseRepository {
     this.db = db;
   }
   
-  putExercises(exercises: Exercise[]) {
+  putList(exercises: Exercise[]) {
     return this.db.bulkDocs(exercises);
   }
 
@@ -21,7 +21,7 @@ export class ExerciseRepository {
     return this.rawData;
   }
 
-  getExercises() {
+  getAll() {
     if (this.data) {
       return Promise.resolve(this.data);
     }

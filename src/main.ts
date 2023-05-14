@@ -30,7 +30,7 @@ const app = createApp(App)
 
 const exercisesDB = new PouchDB('exercises');
 const exerciseRepo = new ExerciseRepository(exercisesDB);
-exerciseRepo.putExercises(defaultExercises).catch((err) => {
+exerciseRepo.putList(defaultExercises).catch((err) => {
   console.error(err.message);
 });
 app.provide('repoExercises', exerciseRepo);

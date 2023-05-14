@@ -24,23 +24,23 @@ afterEach(async (ctx) => {
 })
 
 describe('ExerciseRepository', () => {
-  test('putExercises puts initExercises in db', async (ctx) => {
+  test('putList puts initExercises in db', async (ctx) => {
     // const db: PouchDB.Database = ctx["db"];
     const db: PouchDB.Database = new PouchDB('testDB');
     const repo = new ExerciseRepository(db);
-    await repo.putExercises(initExercises);
+    await repo.putList(initExercises);
     const ret = await db.allDocs({include_docs: true});
     expect(ret.total_rows).toBeGreaterThan(0);
     ret.rows.forEach((row, idx) => {
       expect(row.id).toEqual(initExercises[idx]._id);
     });
   }),
-  test('getExercises gets initExercises from db', async (ctx) => {
+  test('getAll gets initExercises from db', async (ctx) => {
     const db: PouchDB.Database = ctx["db"];
     await db.bulkDocs(initExercises);
 
     const repo = new ExerciseRepository(db);
-    const data = await repo.getExercises();
+    const data = await repo.getAll();
     const rawData = repo.getRawData();
     expect(data.length).toEqual(initExercises.length);
     expect(rawData.length).toEqual(initExercises.length);
@@ -54,14 +54,14 @@ describe('ExerciseRepository', () => {
     await db.bulkDocs(initExercises);
 
     const repo = new ExerciseRepository(db);
-    const data = await repo.getExercises();
+    const data = await repo.getAll();
     const rawData = repo.getRawData();
     expect(data.length).toEqual(initExercises.length);
     expect(rawData.length).toEqual(initExercises.length);
 
     const newEl = {_id: "test_id", test: "test"};
     await repo.put(newEl);
-    await repo.getExercises();
+    await repo.getAll();
     const newRawData = repo.getRawData();
     expect(newRawData.length).toEqual(initExercises.length+1);
   })

@@ -28,7 +28,7 @@ import {
   IonMenuButton,
   IonProgressBar
 } from '@ionic/vue';
-import { Ref, inject, ref } from 'vue';
+import { inject, ref } from 'vue';
 
 import { Exercise } from '@/model/exercise';
 import { ExerciseRepository } from '@/repository/exerciseRepository';
@@ -38,7 +38,7 @@ const repoEx: ExerciseRepository = inject('repoExercises')!;
 
 const exList = ref();
 
-repoEx.getExercises().then(res => {
+repoEx.getAll().then(res => {
   exList.value = res;
   console.log(res);
 }).catch(err => {
