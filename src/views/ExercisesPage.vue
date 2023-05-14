@@ -6,11 +6,12 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>Exercises</ion-title>
+        <ion-progress-bar v-if="!exList" type="indeterminate"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ExerciseList :ex-list="data" />
+      <ExerciseList v-if="exList" :ex-list="exList" />
     </ion-content>
   </ion-page>
 </template>
@@ -24,7 +25,8 @@ import {
   IonToolbar,
   IonButtons,
   IonButton,
-  IonMenuButton
+  IonMenuButton,
+  IonProgressBar
 } from '@ionic/vue';
 import { Ref, inject, ref } from 'vue';
 
@@ -34,13 +36,13 @@ import ExerciseList from '@/components/ExerciseList.vue';
 
 const repoEx: ExerciseRepository = inject('repoExercises')!;
 
-const data = ref();
+const exList = ref();
 
 repoEx.getExercises().then(res => {
-  data.value = res;
+  exList.value = res;
   console.log(res);
 }).catch(err => {
-  console.log(err);
+  console.error(err);
 })
 
 </script>
