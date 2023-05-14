@@ -1,14 +1,14 @@
 import { Exercise } from '@/model/exercise';
+import { Ref, ref } from 'vue';
 
 export class ExerciseRepository {
   private db: PouchDB.Database;
-  private rawData?: Object[];
-  private data?: Exercise[];
+  private data?: Ref<Exercise[]>;
 
   constructor(db: PouchDB.Database) {
     this.db = db;
   }
-  
+
   putList(exercises: Exercise[]) {
     return this.db.bulkDocs(exercises);
   }
@@ -16,40 +16,28 @@ export class ExerciseRepository {
   put(exercise: Exercise) {
     return this.db.put(exercise);
   }
-  
-  getRawData() {
-    return this.rawData;
-  }
 
   getAll() {
     if (this.data) {
       return Promise.resolve(this.data);
     }
-
+    
     return new Promise((resolve, reject) => {
       this.db
         .allDocs({
           include_docs: true,
         })
         .then((result) => {
-          this.rawData = [];
-          this.data = [];
+          this.data = ref([]);
           result.rows.forEach((row) => {
-            this.rawData!.push(row.doc!);
-            this.data!.push(Exercise.from_obj(row.doc!));
+            this.data!.value.push(Exercise.from_obj(row.doc!));
           });
-
           resolve(this.data);
 
           this.db
             .changes({ live: true, since: 'now', include_docs: true })
             .on('change', (change) => {
               this.handleChange(change);
-            }).on('complete', function(info) {
-              // changes() was canceled
-              console.log(info);
-            }).on('error', function (err) {
-              console.log(err);
             });
         })
         .catch((error) => {
@@ -62,7 +50,7 @@ export class ExerciseRepository {
     let changedDoc = null;
     let changedIndex: number | null = null;
 
-    this.data!.forEach((doc, index) => {
+    this.data!.value.forEach((doc, index) => {
       if (doc._id === change.id) {
         changedDoc = doc;
         changedIndex = index;
@@ -71,18 +59,15 @@ export class ExerciseRepository {
 
     //A document was deleted
     if (change.deleted) {
-      this.rawData!.splice(changedIndex!, 1);
-      this.data!.splice(changedIndex!, 1);
+      this.data!.value.splice(changedIndex!, 1);
     } else {
       //A document was updated
       if (changedDoc) {
-        this.rawData![changedIndex!] = change.doc!;
-        this.data![changedIndex!] = Exercise.from_obj(change.doc!);
+        this.data!.value[changedIndex!] = Exercise.from_obj(change.doc!);
       }
       //A document was added
       else {
-        this.rawData!.push(change.doc!);
-        this.data!.push(Exercise.from_obj(change.doc!));
+        this.data!.value.push(Exercise.from_obj(change.doc!));
       }
     }
   }
