@@ -56,15 +56,12 @@ import {
   IonButton,
   IonModal,
   IonItem,
-  IonLabel,
   IonInput,
   actionSheetController,
-  IonRadioGroup,
-  IonRadio,
   IonSelect,
   IonSelectOption
 } from '@ionic/vue';
-import { Ref, ref, watch, watchEffect } from 'vue';
+import { Ref, ref } from 'vue';
 import { Exercise } from '@/model/exercise';
 
 defineProps<{
