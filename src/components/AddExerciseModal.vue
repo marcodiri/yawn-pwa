@@ -19,6 +19,12 @@
           @ion-input="removeInvalid"></ion-input>
       </ion-item>
       <ion-item>
+        <ion-select aria-label="record-type" label="Type *" interface="action-sheet" label-placement="floating"
+          v-model="exRcrd">
+          <ion-select-option v-for="rcrd in Exercise.RecordType" :value="rcrd">{{ rcrd }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
         <ion-select aria-label="equipment" label="Equipment *" interface="action-sheet" label-placement="floating"
           v-model="exEqpm">
           <ion-select-option v-for="eqpm in Exercise.Equipment" :value="eqpm">{{ eqpm }}</ion-select-option>
@@ -72,6 +78,7 @@ const emit = defineEmits<{
 const modal = ref(null);
 const exNameInputRef = ref(null);
 const exName = ref("");
+const exRcrd = ref(Exercise.RecordType.WaR);
 const exEqpm = ref(Exercise.Equipment.Barbell);
 const exMsclP = ref(Exercise.MuscleGroup.Chest);
 const exMsclS: Ref<Exercise.MuscleGroup[]> = ref([]);
@@ -95,6 +102,11 @@ function validateFields() {
     exNameInputEl.classList.add('ion-valid')
   } else {
     exNameInputEl.classList.add('ion-invalid');
+    formValid = false;
+  }
+
+  const exRcrdValid = isRequired(exRcrd.value);
+  if (!exRcrdValid) {
     formValid = false;
   }
 
@@ -128,6 +140,7 @@ function confirm() {
     exMsclSArray.push(e);
   const newExercise = new Exercise(
     exName.value,
+    exRcrd.value,
     exEqpm.value,
     exMsclP.value,
     exMsclSArray.length ? exMsclSArray : undefined);
