@@ -58,8 +58,8 @@ const page = ref(null);
 let presentingElement: HTMLElement;
 onMounted(() => { presentingElement = page.value!["$el"] });
 
-function listener(data: string) {
-  console.log(data)
+function listener(newExercise: Exercise) {
+  repoEx.put(newExercise);
 }
 </script>
 

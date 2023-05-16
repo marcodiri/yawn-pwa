@@ -14,19 +14,33 @@
     </ion-header>
     <ion-content class="ion-padding">
       <ion-item>
-        <ion-label position="stacked">
-          Exercise name *
-          <span v-if="exNameError" class="error"> ({{ exNameError }})</span>
-        </ion-label>
-        <ion-input type="text" name="exName" v-model="exName"></ion-input>
+        <ion-input ref="exNameInputRef" type="text" name="exName" v-model="exName" label="Exercise Name *"
+          label-placement="floating" error-text="This field is required" class="ion-touched no-bottom-line"
+          @ion-input="removeInvalid"></ion-input>
       </ion-item>
-
+      <ion-item>
+        <ion-select aria-label="equipment" label="Equipment *" interface="action-sheet" label-placement="floating"
+          v-model="exEqpm">
+          <ion-select-option v-for="eqpm in Exercise.Equipment" :value="eqpm">{{ eqpm }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-select aria-label="muscle-target" label="Target Muscle *" interface="action-sheet" label-placement="floating"
+          v-model="exMsclP">
+          <ion-select-option v-for="mscl in Exercise.MuscleGroup" :value="mscl">{{ mscl }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-select aria-label="muscle-synergists" label="Synergists Muscles (optional)" interface="alert"
+          label-placement="floating" :multiple="true" v-model="exMsclS">
+          <ion-select-option v-for="mscl in Exercise.MuscleGroup" :value="mscl">{{ mscl }}</ion-select-option>
+        </ion-select>
+      </ion-item>
     </ion-content>
   </ion-modal>
 </template>
 
 <script setup lang="ts">
-import { Exercise } from '@/model/exercise';
 import {
   IonContent,
   IonHeader,
@@ -39,8 +53,13 @@ import {
   IonLabel,
   IonInput,
   actionSheetController,
+  IonRadioGroup,
+  IonRadio,
+  IonSelect,
+  IonSelectOption
 } from '@ionic/vue';
-import { ref, watch, watchEffect } from 'vue';
+import { Ref, ref, watch, watchEffect } from 'vue';
+import { Exercise } from '@/model/exercise';
 
 defineProps<{
   trigger: string
@@ -51,21 +70,45 @@ const emit = defineEmits<{
 }>()
 
 const modal = ref(null);
+const exNameInputRef = ref(null);
 const exName = ref("");
-const exNameError = ref();
+const exEqpm = ref(Exercise.Equipment.Barbell);
+const exMsclP = ref(Exercise.MuscleGroup.Chest);
+const exMsclS: Ref<Exercise.MuscleGroup[]> = ref([]);
+
+function removeInvalid(ev: any) {
+  ev.target.classList.remove('ion-invalid');
+}
 
 function isRequired(value: string) {
   if (value && value.trim()) {
-    return;
+    return true;
   }
-  return "this field is required"
+  return false;
 }
 
 function validateFields() {
-  exNameError.value = isRequired(exName.value);
-  if (exNameError.value) return false;
+  let formValid = true;
+  const exNameInputEl = (exNameInputRef.value!['$el'] as typeof IonInput);
+  const exNameValid = isRequired(exName.value);
+  if (exNameValid) {
+    exNameInputEl.classList.add('ion-valid')
+  } else {
+    exNameInputEl.classList.add('ion-invalid');
+    formValid = false;
+  }
 
-  return true;
+  const exEqpmValid = isRequired(exEqpm.value);
+  if (!exEqpmValid) {
+    formValid = false;
+  }
+
+  const exMsclPValid = isRequired(exMsclP.value);
+  if (!exMsclPValid) {
+    formValid = false;
+  }
+
+  return formValid;
 }
 
 let modalIntent: string = 'cancel';
@@ -74,12 +117,23 @@ function cancel() {
   modalIntent = intent;
   (modal.value!['$el'] as typeof IonModal).dismiss(null, intent);
 }
+
 function confirm() {
   const intent = 'confirm';
   modalIntent = intent;
   if (!validateFields()) return;
-  (modal.value!['$el'] as typeof IonModal).dismiss(exName.value, intent);
+  const exMsclSArray: Exercise.MuscleGroup[] = [];
+  // for some reason passing exMsclS.value directly returns a Proxy instead of an array
+  for (let e of exMsclS.value)
+    exMsclSArray.push(e);
+  const newExercise = new Exercise(
+    exName.value,
+    exEqpm.value,
+    exMsclP.value,
+    exMsclSArray.length ? exMsclSArray : undefined);
+  (modal.value!['$el'] as typeof IonModal).dismiss(newExercise, intent);
 }
+
 async function canDismiss() {
   if (modalIntent === 'confirm') return true;
   const actionSheet = await actionSheetController.create({
@@ -99,19 +153,30 @@ async function canDismiss() {
   const { role } = await actionSheet.onWillDismiss();
   return role === 'destructive';
 }
+
 function onWillDismiss(ev: CustomEvent) {
   if (ev.detail.role === 'confirm') {
-    console.log(ev.detail);
-    emit('confirm', exName.value);
+    emit('confirm', ev.detail.data);
   }
-  // TODO: reset form v-model bindings values to default
+  // reset form v-model bindings values to default
   exName.value = "";
-  exNameError.value = undefined;
+  exEqpm.value = Exercise.Equipment.Barbell;
+  exMsclP.value = Exercise.MuscleGroup.Chest;
+  exMsclS.value = [];
 }
 </script>
 
 <style scoped>
-span.error {
-  color: var(--ion-color-warning, #ffc409);
+ion-item {
+  --inner-border-width: 0;
+  --border-radius: 10px;
+}
+
+ion-item:not(:first-of-type) {
+  margin-top: var(--padding-start);
+}
+
+ion-select {
+  border-bottom: 1px solid var(--ion-color-light-shade);
 }
 </style>
