@@ -61,7 +61,7 @@ import {
   IonSelect,
   IonSelectOption
 } from '@ionic/vue';
-import { Ref, ref } from 'vue';
+import { Ref, ref, toRaw } from 'vue';
 import { Exercise } from '@/model/exercise';
 
 defineProps<{
@@ -131,10 +131,7 @@ function confirm() {
   const intent = 'confirm';
   modalIntent = intent;
   if (!validateFields()) return;
-  const exMsclSArray: Exercise.MuscleGroup[] = [];
-  // for some reason passing exMsclS.value directly returns a Proxy instead of an array
-  for (let e of exMsclS.value)
-    exMsclSArray.push(e);
+  const exMsclSArray = toRaw(exMsclS.value);
   const newExercise = new Exercise(
     exName.value,
     exRcrd.value,
