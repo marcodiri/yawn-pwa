@@ -15,8 +15,13 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ExerciseList v-if="exList" :ex-list="exList" />
-      <AddExerciseModal trigger="open-modal" :presenting-element="presentingElement" @confirm="listener" />
+      <AddExerciseModal trigger="open-modal" :presenting-element="presentingElement" @confirm="addExerciseToDb" />
+
+      <ion-list>
+        <ion-item button v-for="(ex, idx) in exList" class="list-item" lines="full" @click="showExerciseInfo(idx)">
+          <ion-label>{{ ex.name }}</ion-label>
+        </ion-item>
+      </ion-list>
     </ion-content>
   </ion-page>
 </template>
@@ -32,17 +37,19 @@ import {
   IonButton,
   IonMenuButton,
   IonProgressBar,
-  IonIcon
+  IonIcon,
+  IonList,
+  IonItem,
+  IonLabel,
 } from '@ionic/vue';
 import {
   addSharp,
   addOutline
 } from 'ionicons/icons';
-import { Ref, inject, onMounted, ref } from 'vue';
+import { Ref, inject, onMounted, ref, toRaw } from 'vue';
 
 import { Exercise } from '@/model/exercise';
 import { ExerciseRepository } from '@/repository/exerciseRepository';
-import ExerciseList from '@/components/ExerciseList.vue';
 import AddExerciseModal from '@/components/AddExerciseModal.vue';
 
 const repoEx: ExerciseRepository = inject('repoExercises')!;
@@ -58,13 +65,21 @@ const page = ref(null);
 let presentingElement: HTMLElement;
 onMounted(() => { presentingElement = page.value!["$el"] });
 
-function listener(newExercise: Exercise) {
+function addExerciseToDb(newExercise: Exercise) {
   repoEx.put(newExercise);
+}
+
+function showExerciseInfo(idx: number) {
+  const exClicked = toRaw(exList.value)![idx]
 }
 </script>
 
 <style scoped>
 ion-toolbar>ion-buttons ion-button {
   font-size: 1.3em;
+}
+
+ion-item.list-item:last-of-type {
+  --border-width: 0;
 }
 </style>
