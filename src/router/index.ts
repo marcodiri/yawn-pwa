@@ -4,12 +4,12 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/plan/current'
+    redirect: '/start'
   },
   {
-    path: '/plan/:page',
-    name: 'Plan',
-    component: () => import ('@/views/PlanPage.vue')
+    path: '/start',
+    name: 'Start',
+    component: () => import ('@/views/StartPage.vue')
   },
   {
     path: '/exercises',

@@ -26,6 +26,6 @@ import {
 } from '@ionic/vue';
 import { inject } from 'vue';
 
-const pageTitle = inject('pageTitle')
+const pageTitle = inject('pageTitle');
 
 </script>
