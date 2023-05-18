@@ -1,0 +1,82 @@
+<template>
+  <ion-page ref="page">
+    <ion-header :translucent="true">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button color="primary"></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Exercises</ion-title>
+        <ion-buttons slot="end">
+          <ion-button id="open-modal">
+            <ion-icon aria-hidden="true" :ios="addOutline" :md="addSharp"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-progress-bar v-if="!exList" type="indeterminate"></ion-progress-bar>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true">
+      <AddExerciseModal trigger="open-modal" :presenting-element="presentingElement" @confirm="addExerciseToDb" />
+
+      <ion-list>
+        <ion-item button v-for="[key, ex] in exList" class="list-item" lines="full" @click="showExerciseInfo(key)">
+          <ion-label>{{ ex.name }}</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-page>
+</template>
+
+<script setup lang="ts">
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonButtons,
+  IonButton,
+  IonMenuButton,
+  IonProgressBar,
+  IonIcon,
+  IonList,
+  IonItem,
+  IonLabel,
+} from '@ionic/vue';
+import {
+  addSharp,
+  addOutline
+} from 'ionicons/icons';
+import { Ref, inject, onMounted, ref, toRaw } from 'vue';
+
+import { Exercise } from '@/model/exercise';
+import { ExerciseRepository } from '@/repository/exerciseRepository';
+import AddExerciseModal from '@/components/AddExerciseModal.vue';
+import { useRouter } from 'vue-router';
+
+const repoEx: ExerciseRepository = inject('repoExercises')!;
+const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
+
+const page = ref(null);
+let presentingElement: HTMLElement;
+onMounted(() => { presentingElement = page.value!["$el"] });
+
+function addExerciseToDb(newExercise: Exercise) {
+  repoEx.put(newExercise);
+}
+
+const router = useRouter();
+function showExerciseInfo(key: string) {
+  const exClicked = toRaw(exList.value!.get(key));
+  router.push({ name: 'ExerciseInfo', params: { id: exClicked!._id } });
+}
+</script>
+
+<style scoped>
+ion-toolbar>ion-buttons ion-button {
+  font-size: 1.3em;
+}
+
+ion-item.list-item:last-of-type {
+  --border-width: 0;
+}
+</style>

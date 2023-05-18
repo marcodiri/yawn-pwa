@@ -55,6 +55,12 @@ const appPages = [
     iosIcon: paperPlaneOutline,
     mdIcon: paperPlaneSharp,
   },
+  {
+    title: 'Exercises',
+    url: '/exercises',
+    iosIcon: paperPlaneOutline,
+    mdIcon: paperPlaneSharp,
+  },
 ];
 
 const selectedIndex = ref(0);
