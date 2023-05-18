@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>Exercises</ion-title>
+        <ion-title>{{ pageTitle }}</ion-title>
         <ion-buttons slot="end">
           <ion-button id="open-modal">
             <ion-icon aria-hidden="true" :ios="addOutline" :md="addSharp"></ion-icon>
@@ -53,6 +53,7 @@ import { ExerciseRepository } from '@/repository/exerciseRepository';
 import AddExerciseModal from '@/components/AddExerciseModal.vue';
 import { useRouter } from 'vue-router';
 
+const pageTitle = inject('pageTitle');
 const repoEx: ExerciseRepository = inject('repoExercises')!;
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
 

@@ -3,13 +3,13 @@
     <ion-split-pane content-id="main-content" disabled>
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
-          <ion-list id="inbox-list">
+          <ion-list>
             <ion-list-header>Menu</ion-list-header>
-            <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
-              <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url"
-                lines="none" :detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
-                <ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
-                <ion-label>{{ p.title }}</ion-label>
+            <ion-menu-toggle :auto-hide="false" v-for="[key, page] in appPages" :key="key">
+              <ion-item router-direction="root" :router-link="key" lines="none" :detail="false" class="hydrated"
+                :class="{ selected: selectedKey === key }">
+                <ion-icon aria-hidden="true" slot="start" :ios="page.iosIcon" :md="page.mdIcon"></ion-icon>
+                <ion-label>{{ page.title }}</ion-label>
               </ion-item>
             </ion-menu-toggle>
           </ion-list>
@@ -34,49 +34,46 @@ import {
   IonMenuToggle,
   IonSplitPane
 } from '@ionic/vue';
-import { ref, provide, watchEffect } from 'vue';
+import { ref, provide, watch, Ref } from 'vue';
 import {
   mailOutline,
   mailSharp,
   paperPlaneOutline,
   paperPlaneSharp,
 } from 'ionicons/icons';
+import { useRoute } from 'vue-router';
 
-const appPages = [
-  {
-    title: 'Current Plan',
-    url: '/plan/current',
+const appPages: Map<string, { [key: string]: string }> = new Map([
+  ['/start', {
+    title: "Start Workout",
     iosIcon: mailOutline,
     mdIcon: mailSharp,
-  },
-  {
-    title: 'My Plans',
-    url: '/plan/myplans',
+  }],
+  ['/exercises', {
+    title: "Exercises",
     iosIcon: paperPlaneOutline,
     mdIcon: paperPlaneSharp,
+  }],
+]);
+
+const selectedKey: Ref<string | undefined> = ref();
+const currentPageTitle: Ref<string | undefined> = ref();
+provide('pageTitle', currentPageTitle);
+
+const route = useRoute();
+watch(
+  () => route.name,
+  () => {
+    selectedKey.value = route.path;
+    const currentPage = appPages.get(route.path);
+    if (!currentPage) {
+      console.log("404");
+    } else {
+      currentPageTitle.value = currentPage!.title;
+    }
   },
-  {
-    title: 'Exercises',
-    url: '/exercises',
-    iosIcon: paperPlaneOutline,
-    mdIcon: paperPlaneSharp,
-  },
-];
-
-const selectedIndex = ref(0);
-const pageTitle = ref()
-watchEffect(() => {
-  pageTitle.value = appPages[selectedIndex.value].title
-})
-provide('pageTitle', pageTitle);
-
-const path = window.location.pathname.split('plan/')[1];
-if (path !== undefined) {
-  selectedIndex.value = appPages.findIndex((page) =>
-    page.url.split('plan/')[1] === path.toLowerCase()
-  );
-}
-
+  { immediate: true }
+)
 </script>
 
 <style scoped>
