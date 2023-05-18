@@ -3,7 +3,7 @@ import { Ref, ref } from 'vue';
 
 export class ExerciseRepository {
   private db: PouchDB.Database;
-  private data?: Ref<Exercise[]>;
+  private data?: Ref<Map<string, Exercise>>;
 
   constructor(db: PouchDB.Database) {
     this.db = db;
@@ -21,16 +21,17 @@ export class ExerciseRepository {
     if (this.data) {
       return Promise.resolve(this.data);
     }
-    
+
     return new Promise((resolve, reject) => {
       this.db
         .allDocs({
           include_docs: true,
         })
         .then((result) => {
-          this.data = ref([]);
+          this.data = ref(new Map<string, Exercise>());
           result.rows.forEach((row) => {
-            this.data!.value.push(Exercise.from_obj(row.doc!));
+            const ex = Exercise.from_obj(row.doc!);
+            this.data!.value.set(ex._id, ex);
           });
           resolve(this.data);
 
@@ -47,27 +48,26 @@ export class ExerciseRepository {
   }
 
   handleChange(change: PouchDB.Core.ChangesResponseChange<{}>) {
-    let changedDoc = null;
-    let changedIndex: number | null = null;
+    let changedKey: string | null = null;
 
-    this.data!.value.forEach((doc, index) => {
-      if (doc._id === change.id) {
-        changedDoc = doc;
-        changedIndex = index;
+    this.data!.value.forEach((val, key) => {
+      if (val._id === change.id) {
+        changedKey = key;
       }
     });
 
     //A document was deleted
     if (change.deleted) {
-      this.data!.value.splice(changedIndex!, 1);
+      this.data!.value.delete(changedKey!);
     } else {
       //A document was updated
-      if (changedDoc) {
-        this.data!.value[changedIndex!] = Exercise.from_obj(change.doc!);
+      if (changedKey) {
+        this.data!.value.set(changedKey!, Exercise.from_obj(change.doc!));
       }
       //A document was added
       else {
-        this.data!.value.push(Exercise.from_obj(change.doc!));
+        const ex = Exercise.from_obj(change.doc!);
+        this.data!.value.set(ex._id, ex);
       }
     }
   }

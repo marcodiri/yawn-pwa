@@ -18,7 +18,7 @@
       <AddExerciseModal trigger="open-modal" :presenting-element="presentingElement" @confirm="addExerciseToDb" />
 
       <ion-list>
-        <ion-item button v-for="(ex, idx) in exList" class="list-item" lines="full" @click="showExerciseInfo(idx)">
+        <ion-item button v-for="[key, ex] in exList" class="list-item" lines="full" @click="showExerciseInfo(key)">
           <ion-label>{{ ex.name }}</ion-label>
         </ion-item>
       </ion-list>
@@ -51,15 +51,10 @@ import { Ref, inject, onMounted, ref, toRaw } from 'vue';
 import { Exercise } from '@/model/exercise';
 import { ExerciseRepository } from '@/repository/exerciseRepository';
 import AddExerciseModal from '@/components/AddExerciseModal.vue';
+import { useRouter } from 'vue-router';
 
 const repoEx: ExerciseRepository = inject('repoExercises')!;
-const exList: Ref<Exercise[] | undefined> = ref();
-
-repoEx.getAll().then(data => {
-  exList.value = (data as Ref<Exercise[]>).value;
-}).catch(err => {
-  console.error(err);
-});
+const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
 
 const page = ref(null);
 let presentingElement: HTMLElement;
@@ -69,8 +64,10 @@ function addExerciseToDb(newExercise: Exercise) {
   repoEx.put(newExercise);
 }
 
-function showExerciseInfo(idx: number) {
-  const exClicked = toRaw(exList.value)![idx]
+const router = useRouter();
+function showExerciseInfo(key: string) {
+  const exClicked = toRaw(exList.value!.get(key));
+  // router.push({ name: 'ExerciseInfo', params: { id: exClicked._id } });
 }
 </script>
 
