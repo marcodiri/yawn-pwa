@@ -67,7 +67,7 @@ function addExerciseToDb(newExercise: Exercise) {
 const router = useRouter();
 function showExerciseInfo(key: string) {
   const exClicked = toRaw(exList.value!.get(key));
-  // router.push({ name: 'ExerciseInfo', params: { id: exClicked._id } });
+  router.push({ name: 'ExerciseInfo', params: { id: exClicked!._id } });
 }
 </script>
 
