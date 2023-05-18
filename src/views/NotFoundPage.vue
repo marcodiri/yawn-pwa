@@ -4,7 +4,9 @@
       <div id="container">
         <p class="code">404</p>
         <h1 class="title">PAGE NOT FOUND</h1>
-        <ion-button class="btn-home" @click="$router.replace('/start')">Back to Home</ion-button>
+        <div class="action">
+          <ion-button class="btn-home" @click="$router.replace({ name: 'Start' })">Back to Home</ion-button>
+        </div>
       </div>
     </ion-content>
   </ion-page>
@@ -14,7 +16,8 @@
 import {
   IonContent,
   IonPage,
-  IonButton} from '@ionic/vue';
+  IonButton
+} from '@ionic/vue';
 </script>
   
 <style scoped>
@@ -43,7 +46,7 @@ h1.title {
   font-weight: 700;
 }
 
-.btn-home {
-  margin-top: 32px;
+div.action {
+  padding-top: 32px;
 }
 </style>
