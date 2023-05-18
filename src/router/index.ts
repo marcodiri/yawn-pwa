@@ -16,6 +16,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Exercises',
     component: () => import ('@/views/ExercisesPage.vue')
   },
+  {
+    path: '/exercises/:id',
+    name: 'ExerciseInfo',
+    component: () => import ('@/views/ExerciseInfoPage.vue')
+  },
 ]
 
 const router = createRouter({
