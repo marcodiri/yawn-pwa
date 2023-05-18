@@ -9,17 +9,22 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/start',
     name: 'Start',
-    component: () => import ('@/views/StartPage.vue')
+    component: () => import('@/views/StartPage.vue')
   },
   {
     path: '/exercises',
     name: 'Exercises',
-    component: () => import ('@/views/ExercisesPage.vue')
+    component: () => import('@/views/ExercisesPage.vue')
   },
   {
     path: '/exercises/:id',
     name: 'ExerciseInfo',
-    component: () => import ('@/views/ExerciseInfoPage.vue')
+    component: () => import('@/views/ExerciseInfoPage.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFoundPage.vue')
   },
 ]
 
