@@ -76,6 +76,13 @@ watch(
 )
 </script>
 
+<style>
+/* Prevent Pull-to-Refresh on mobile */
+html {
+  overscroll-behavior-y: contain;
+}
+</style>
+
 <style scoped>
 ion-menu.md ion-item.selected {
   --background: rgba(var(--ion-color-primary-rgb), 0.14);
