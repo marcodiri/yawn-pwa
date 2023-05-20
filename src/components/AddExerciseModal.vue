@@ -128,9 +128,9 @@ function cancel() {
 }
 
 function confirm() {
+  if (!validateFields()) return;
   const intent = 'confirm';
   modalIntent = intent;
-  if (!validateFields()) return;
   const exMsclSArray = toRaw(exMsclS.value);
   const newExercise = new Exercise(
     exName.value,
