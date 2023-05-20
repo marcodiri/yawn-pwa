@@ -5,11 +5,31 @@
         <ion-buttons slot="start">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>{{ pageTitle }}</ion-title>
+        <ion-title>{{ sliderDate }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
+      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @swiper="onSwiper"
+        @slide-change="updateSliderIdx">
+        <swiper-slide v-for="date in datesArray">
+          <header>
+            <h1>Summary</h1>
+          </header>
+          <ion-card class="card-summary">
+            <ion-card-content>
+              <span class="no-logs">No logs yet</span>
+            </ion-card-content>
+          </ion-card>
+          <header>
+            <h1>Exercises</h1>
+          </header>
+          <ion-button class="btn-add-exercise ion-text-uppercase" expand="block">
+            <ion-icon slot="start" aria-hidden="true" :icon="addCircleOutline"></ion-icon>
+            <ion-label>Log exercise</ion-label>
+          </ion-button>
+        </swiper-slide>
+      </swiper>
     </ion-content>
   </ion-page>
 </template>
@@ -22,10 +42,95 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  IonMenuButton
+  IonMenuButton,
+  IonicSlides,
+  IonLabel,
+  IonButton,
+  IonIcon,
+  IonFab,
+  IonFabButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
 } from '@ionic/vue';
-import { inject } from 'vue';
+import { addCircleOutline } from 'ionicons/icons';
+import { computed, inject, ref } from 'vue';
+
+import 'swiper/css';
+import 'swiper/css/keyboard';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Swiper as SwiperType, Keyboard } from 'swiper';
+import SliderButtons from '@/components/SliderButtons.vue';
 
 const pageTitle = inject('pageTitle');
 
+const modules = [Keyboard, IonicSlides];
+
+const datesArray: Array<Date> = [];
+const currentDate = new Date();
+const daysRange = 10;
+
+for (let i = 0; i < daysRange * 2 + 1; i++) {
+  datesArray[i] = new Date();
+  datesArray[i].setDate(currentDate.getDate() + i - daysRange);
+}
+
+let swiper_: SwiperType;
+const onSwiper = (s: SwiperType) => {
+  swiper_ = s;
+};
+
+const sliderActiveIdx = ref(daysRange);
+const updateSliderIdx = (swiper: SwiperType) => {
+  sliderActiveIdx.value = swiper.activeIndex;
+};
+
+const sliderDate = computed(() => {
+  const splits = datesArray[sliderActiveIdx.value].toDateString().split(" ");
+  return splits[0] + ", " + splits[1] + " " + splits[2];
+})
+
 </script>
+
+<style scoped>
+header {
+  margin: 20px 0 6px 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1em;
+}
+
+.swiper {
+  height: 100%;
+}
+
+.swiper-slide {
+  padding-inline: 16px;
+}
+
+.no-logs {
+  margin: 0;
+  letter-spacing: 1px;
+  line-height: 20px;
+  font-size: 1.3em;
+  font-weight: 700;
+}
+
+.card-summary,
+.btn-add-exercise {
+  margin-inline: 0;
+}
+
+.card-summary {
+  margin-top: 0;
+}
+
+.ios .card-summary {
+  /* --border-radius: 8px;
+  border-radius: var(--border-radius); */
+}
+</style>

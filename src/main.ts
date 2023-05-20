@@ -27,7 +27,7 @@ import { Exercise } from './model/exercise';
 
 const app = createApp(App)
   .use(IonicVue, {
-    // mode: 'ios',
+    mode: 'ios',
   })
   .use(router);
 
