@@ -10,7 +10,8 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-fab class="btn-log-exercise">
+      <LogExerciseModal trigger="open-log-ex-modal" />
+      <ion-fab id="open-log-ex-modal" class="btn-log-exercise">
         <ion-fab-button>
           <ion-icon :icon="add"></ion-icon>
         </ion-fab-button>
@@ -63,6 +64,8 @@ import 'swiper/css';
 import 'swiper/css/keyboard';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperType, Keyboard } from 'swiper';
+
+import LogExerciseModal from '@/components/LogExerciseModal.vue'
 
 const pageTitle = inject('pageTitle');
 
