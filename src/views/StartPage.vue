@@ -10,6 +10,11 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
+      <ion-fab class="btn-log-exercise">
+        <ion-fab-button>
+          <ion-icon :icon="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
       <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @swiper="onSwiper"
         @slide-change="updateSliderIdx">
         <swiper-slide v-for="date in datesArray">
@@ -24,10 +29,6 @@
           <header>
             <h1>Exercises</h1>
           </header>
-          <ion-button class="btn-add-exercise ion-text-uppercase" expand="block">
-            <ion-icon slot="start" aria-hidden="true" :icon="addCircleOutline"></ion-icon>
-            <ion-label>Log exercise</ion-label>
-          </ion-button>
         </swiper-slide>
       </swiper>
     </ion-content>
@@ -55,14 +56,13 @@ import {
   IonCardTitle,
   IonCardSubtitle,
 } from '@ionic/vue';
-import { addCircleOutline } from 'ionicons/icons';
+import { add, addCircleOutline } from 'ionicons/icons';
 import { computed, inject, ref } from 'vue';
 
 import 'swiper/css';
 import 'swiper/css/keyboard';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperType, Keyboard } from 'swiper';
-import SliderButtons from '@/components/SliderButtons.vue';
 
 const pageTitle = inject('pageTitle');
 
@@ -120,17 +120,14 @@ h1 {
   font-weight: 700;
 }
 
-.card-summary,
-.btn-add-exercise {
-  margin-inline: 0;
+.btn-log-exercise {
+  position: absolute;
+  bottom: 16px;
+  inset-inline-end: calc(16px + var(--ion-safe-area-right, 0px));
 }
 
 .card-summary {
   margin-top: 0;
-}
-
-.ios .card-summary {
-  /* --border-radius: 8px;
-  border-radius: var(--border-radius); */
+  margin-inline: 0;
 }
 </style>
