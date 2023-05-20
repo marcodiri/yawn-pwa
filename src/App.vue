@@ -45,7 +45,7 @@ import { useRoute } from 'vue-router';
 
 const appPages: Map<string, { [key: string]: string }> = new Map([
   ['/start', {
-    title: "Start Workout",
+    title: "Workout Logs",
     iosIcon: mailOutline,
     mdIcon: mailSharp,
   }],
