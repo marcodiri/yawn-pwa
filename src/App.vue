@@ -66,9 +66,7 @@ watch(
   () => {
     selectedKey.value = route.path;
     const currentPage = appPages.get(route.path);
-    if (!currentPage) {
-      console.log("404");
-    } else {
+    if (currentPage) {
       currentPageTitle.value = currentPage!.title;
     }
   },
