@@ -1,14 +1,12 @@
 <template>
-  <ion-modal ref="modal" :trigger="trigger" :presenting-element="presentingElement" @willDismiss="">
+  <ion-modal ref="modal" :trigger="trigger" :presenting-element="presentingElement"
+    @willPresent="attachHistoryListener($el, $router)" @willDismiss="">
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button @click="cancel()">Cancel</ion-button>
+          <ion-back-button default-href="" @click="dismissModal($router)"></ion-back-button>
         </ion-buttons>
         <ion-title>Add exercise</ion-title>
-        <ion-buttons slot="end">
-          <ion-button :strong="true" @click="confirm()">Confirm</ion-button>
-        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
@@ -25,14 +23,17 @@ import {
   IonToolbar,
   IonButtons,
   IonButton,
+  IonBackButton,
   IonModal,
   IonItem,
   IonInput,
   actionSheetController,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
 } from '@ionic/vue';
 import { Ref, inject, ref, toRaw } from 'vue';
+
+import {attachHistoryListener, dismissModal} from '@/composables/modalBackButton';
 
 defineProps<{
   trigger: string
@@ -40,4 +41,5 @@ defineProps<{
 }>()
 
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
+
 </script>
