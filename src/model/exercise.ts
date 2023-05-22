@@ -40,8 +40,8 @@ export class Exercise {
     equipment: string,
     name: string
   ) {
-    return (muscle_primary + "/" +
-      equipment + "/" +
+    return (muscle_primary + "_" +
+      equipment + "_" +
       name).replaceAll(" ", "");
   }
 };
