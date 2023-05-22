@@ -21,6 +21,8 @@ import '@ionic/vue/css/text-transformation.css';
 import './theme/variables.css';
 
 import PouchDB from 'pouchdb'
+import find from 'pouchdb-find';
+import rel from 'relational-pouch';
 import { ExerciseRepository } from './repository/exerciseRepository';
 import defaultExercises from '@/utils/initExercises';
 import { Exercise } from './model/exercise';
@@ -31,8 +33,34 @@ const app = createApp(App)
   })
   .use(router);
 
-const exercisesDB = new PouchDB('exercises');
-const exerciseRepo = new ExerciseRepository(exercisesDB);
+PouchDB
+  .plugin(find)
+  .plugin(rel);
+const yawtDB = new PouchDB('yawt-db') as PouchDB.RelDatabase;
+yawtDB.setSchema([
+  {
+    singular: 'exercise',
+    plural: 'exercises',
+    relations: {
+      logs: {hasMany: 'log'}
+    }
+  },
+  {
+    singular: 'log',
+    plural: 'logs',
+    relations: {
+      exercise: {belongsTo: 'exercise'}
+    }
+  },
+  {
+    singular: 'workout',
+    plural: 'workouts',
+    relations: {
+      log: {hasMany: 'log'}
+    }
+  }
+]);
+const exerciseRepo = new ExerciseRepository(yawtDB);
 exerciseRepo.putList(defaultExercises).catch((err) => {
   console.error(err.message);
 });
