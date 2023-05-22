@@ -2,19 +2,26 @@ import { Exercise } from '@/model/exercise';
 import { Ref, ref } from 'vue';
 
 export class ExerciseRepository {
-  private db: PouchDB.Database;
+  private db: PouchDB.RelDatabase;
   private data?: Ref<Map<string, Exercise>>;
 
-  constructor(db: PouchDB.Database) {
+  constructor(db: PouchDB.RelDatabase) {
     this.db = db;
   }
 
   putList(exercises: Exercise[]) {
-    return this.db.bulkDocs(exercises);
+    return new Promise(async (resolve, reject) => {
+      for (const ex of exercises) {
+        await this.db.rel.save('exercise', ex).catch((err) => {
+          reject(err);
+        });
+      }
+      resolve(null);
+    });
   }
 
   put(exercise: Exercise) {
-    return this.db.put(exercise);
+    return this.db.rel.save('exercise', exercise);
   }
 
   getAll() {
@@ -23,15 +30,12 @@ export class ExerciseRepository {
     }
 
     return new Promise((resolve, reject) => {
-      this.db
-        .allDocs({
-          include_docs: true,
-        })
+      this.db.rel.find('exercise')
         .then((result) => {
           this.data = ref(new Map<string, Exercise>());
-          result.rows.forEach((row) => {
-            const ex = Exercise.from_obj(row.doc!);
-            this.data!.value.set(ex._id, ex);
+          result.exercises.forEach((row: any) => {
+            const ex = Exercise.from_obj(row!);
+            this.data!.value.set(ex.id, ex);
           });
           resolve(this.data);
 
@@ -51,7 +55,7 @@ export class ExerciseRepository {
     let changedKey: string | null = null;
 
     this.data!.value.forEach((val, key) => {
-      if (val._id === change.id) {
+      if (val.id === change.id) {
         changedKey = key;
       }
     });
@@ -66,8 +70,9 @@ export class ExerciseRepository {
       }
       //A document was added
       else {
-        const ex = Exercise.from_obj(change.doc!);
-        this.data!.value.set(ex._id, ex);
+        console.log('change');
+        const ex = Exercise.from_obj((change.doc! as any).data);
+        this.data!.value.set(ex.id, ex);
       }
     }
   }
