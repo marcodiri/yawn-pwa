@@ -42,7 +42,9 @@ export class ExerciseRepository {
           this.db
             .changes({ live: true, since: 'now', include_docs: true })
             .on('change', (change) => {
-              this.handleChange(change);
+              if (change.id.startsWith('exercise')) {
+                this.handleChange(change);
+              }
             });
         })
         .catch((error) => {
@@ -66,11 +68,10 @@ export class ExerciseRepository {
     } else {
       //A document was updated
       if (changedKey) {
-        this.data!.value.set(changedKey!, Exercise.from_obj(change.doc!));
+        this.data!.value.set(changedKey!, Exercise.from_obj((change.doc! as any).data));
       }
       //A document was added
       else {
-        console.log('change');
         const ex = Exercise.from_obj((change.doc! as any).data);
         this.data!.value.set(ex.id, ex);
       }

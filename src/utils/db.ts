@@ -2,6 +2,7 @@ import PouchDB from 'pouchdb'
 import find from 'pouchdb-find';
 import rel from 'relational-pouch';
 import { ExerciseRepository } from '@/repository/exerciseRepository';
+import { ExerciseLogRepository } from '@/repository/exerciseLogRepository';
 
 PouchDB
   .plugin(find)
@@ -26,4 +27,5 @@ yawtDB.setSchema([
 
 export namespace repository {
   export const exercises= new ExerciseRepository(yawtDB);
+  export const exerciseLogs = new ExerciseLogRepository(yawtDB);
 }

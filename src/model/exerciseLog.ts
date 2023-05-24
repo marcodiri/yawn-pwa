@@ -4,15 +4,17 @@
  */
 export class ExerciseLog {
   public id: string;
+  public date: string;
 
   constructor(
     public exercise: string,
     public groupId: number,
-    public date: string,
+    date: Date,
     public weight?: number,
     public reps?: number,
     public rpe?: number,
   ) {
+    this.date = date.toString();
     this.id = ExerciseLog.build_id(
       this.date,
       this.exercise
@@ -34,7 +36,7 @@ export class ExerciseLog {
         (obj as any).rpe,
       );
     } else {
-      throw new TypeError("obj should have the same properties as Exercise");
+      throw new TypeError("obj should have the same properties as ExerciseLog");
     }
   }
 
