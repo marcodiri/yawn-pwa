@@ -19,7 +19,7 @@
           <ion-label>
             Target Muscle: {{ exercise.muscle_primary }}
           </ion-label>
-          <ion-label v-if="exercise.muscle_secondary">
+          <ion-label v-if="exercise.muscle_secondary.length">
             <br />
             Synergists Muscles: {{ exercise.muscle_secondary.join(", ") }}
           </ion-label>

@@ -20,10 +20,9 @@ import '@ionic/vue/css/text-transformation.css';
 
 import './theme/variables.css';
 
-import PouchDB from 'pouchdb'
-import { ExerciseRepository } from './repository/exerciseRepository';
-import defaultExercises from '@/utils/initExercises';
 import { Exercise } from './model/exercise';
+import { repository } from './utils/db'
+import defaultExercises from '@/utils/initExercises';
 
 const app = createApp(App)
   .use(IonicVue, {
@@ -31,20 +30,20 @@ const app = createApp(App)
   })
   .use(router);
 
-const exercisesDB = new PouchDB('exercises');
-const exerciseRepo = new ExerciseRepository(exercisesDB);
-exerciseRepo.putList(defaultExercises).catch((err) => {
-  console.error(err.message);
-});
 const exList: Ref<Map<string, Exercise> | undefined> = ref();
 
-exerciseRepo.getAll().then(data => {
-  exList.value = (data as Ref<Map<string, Exercise>>).value;
-}).catch(err => {
-  console.error(err);
-});
+repository.exercises.putList(defaultExercises)
+  .catch((err) => {
+    console.error(err.message);
+  })
+  .finally(() => {
+    repository.exercises.getAll().then(data => {
+      exList.value = (data as Ref<Map<string, Exercise>>).value;
+    }).catch(err => {
+      console.error(err);
+    });
+  });
 
-app.provide('repoExercises', exerciseRepo);
 app.provide('exercisesList', exList);
 
 router.isReady().then(() => {

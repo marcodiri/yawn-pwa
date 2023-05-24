@@ -137,7 +137,7 @@ function confirm() {
     exRcrd.value,
     exEqpm.value,
     exMsclP.value,
-    exMsclSArray.length ? exMsclSArray : undefined);
+    exMsclSArray);
   (modal.value!['$el'] as typeof IonModal).dismiss(newExercise, intent);
 }
 

@@ -1,16 +1,14 @@
 export class Exercise {
-  public _id: string;
-  public type = "exercise";
+  public id: string;
 
   constructor(
     public name: string,
     public recordType: Exercise.RecordType,
     public equipment: Exercise.Equipment,
     public muscle_primary: Exercise.MuscleGroup,
-    public muscle_secondary?: Exercise.MuscleGroup[],
+    public muscle_secondary: Exercise.MuscleGroup[],
   ) {
-    this._id = Exercise.build_id(
-      this.type,
+    this.id = Exercise.build_id(
       this.muscle_primary,
       this.equipment,
       this.name
@@ -33,19 +31,17 @@ export class Exercise {
         (obj as any).muscle_secondary
       );
     } else {
-      throw new TypeError("obj should have the same properties as Exercise.");
+      throw new TypeError("obj should have the same properties as Exercise");
     }
   }
 
   static build_id(
-    type: string,
     muscle_primary: string,
     equipment: string,
     name: string
   ) {
-    return (type + "/" +
-      muscle_primary + "/" +
-      equipment + "/" +
+    return (muscle_primary + "_" +
+      equipment + "_" +
       name).replaceAll(" ", "");
   }
 };

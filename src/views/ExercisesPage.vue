@@ -49,12 +49,11 @@ import {
 import { Ref, inject, onMounted, ref, toRaw } from 'vue';
 
 import { Exercise } from '@/model/exercise';
-import { ExerciseRepository } from '@/repository/exerciseRepository';
 import AddExerciseModal from '@/components/AddExerciseModal.vue';
 import { useRouter } from 'vue-router';
+import { repository } from '@/utils/db';
 
 const pageTitle = inject('pageTitle');
-const repoEx: ExerciseRepository = inject('repoExercises')!;
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
 
 const page = ref(null);
@@ -62,13 +61,13 @@ let presentingElement: HTMLElement;
 onMounted(() => { presentingElement = page.value!["$el"] });
 
 function addExerciseToDb(newExercise: Exercise) {
-  repoEx.put(newExercise);
+  repository.exercises.put(newExercise);
 }
 
 const router = useRouter();
 function showExerciseInfo(key: string) {
   const exClicked = toRaw(exList.value!.get(key));
-  router.push({ name: 'ExerciseInfo', params: { id: exClicked!._id } });
+  router.push({ name: 'ExerciseInfo', params: { id: exClicked!.id } });
 }
 </script>
 

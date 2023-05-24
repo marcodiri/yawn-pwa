@@ -10,13 +10,13 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-fab class="btn-log-exercise">
+      <LogExerciseModal trigger="open-log-ex-modal" :date="datesArray[sliderActiveIdx]" :start-group-id="startGroupId" />
+      <ion-fab id="open-log-ex-modal" class="btn-log-exercise">
         <ion-fab-button>
           <ion-icon :icon="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
-      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @swiper="onSwiper"
-        @slide-change="updateSliderIdx">
+      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @slide-change="updateSliderIdx">
         <swiper-slide v-for="date in datesArray">
           <header>
             <h1>Summary</h1>
@@ -57,12 +57,16 @@ import {
   IonCardSubtitle,
 } from '@ionic/vue';
 import { add, addCircleOutline } from 'ionicons/icons';
-import { computed, inject, ref } from 'vue';
+import { Ref, computed, inject, provide, ref, toRaw } from 'vue';
 
 import 'swiper/css';
 import 'swiper/css/keyboard';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperType, Keyboard } from 'swiper';
+
+import LogExerciseModal from '@/components/LogExerciseModal.vue'
+import { repository } from '@/utils/db';
+import { ExerciseLog } from '@/model/exerciseLog';
 
 const pageTitle = inject('pageTitle');
 
@@ -77,14 +81,27 @@ for (let i = 0; i < daysRange * 2 + 1; i++) {
   datesArray[i].setDate(currentDate.getDate() + i - daysRange);
 }
 
-let swiper_: SwiperType;
-const onSwiper = (s: SwiperType) => {
-  swiper_ = s;
-};
-
 const sliderActiveIdx = ref(daysRange);
+const startGroupId = ref(0);
+function incrementGroupId() {
+  startGroupId.value++;
+}
+provide('groupId', { startGroupId, incrementGroupId });
 const updateSliderIdx = (swiper: SwiperType) => {
   sliderActiveIdx.value = swiper.activeIndex;
+  repository.exerciseLogs.getAllDay(datesArray[sliderActiveIdx.value])
+    .then(data => {
+      const logs = toRaw((data as Ref<Map<string, ExerciseLog>>).value);
+      if (!logs.size) {
+        startGroupId.value = 0;
+        return;
+      }
+      // sort by groupId
+      var logsAsc = new Map([...logs.entries()].sort((a, b) => a[1].groupId - b[1].groupId));
+      startGroupId.value = Array.from(logsAsc.values()).pop()!.groupId + 1;
+    }).catch(err => {
+      console.error(err);
+    });
 };
 
 const sliderDate = computed(() => {
