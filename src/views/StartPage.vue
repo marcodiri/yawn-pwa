@@ -29,6 +29,8 @@
           <header>
             <h1>Exercises</h1>
           </header>
+          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" />
+          <!-- <ion-spinner v-else-if="fetchingLogs"></ion-spinner> -->
         </swiper-slide>
       </swiper>
     </ion-content>
@@ -55,6 +57,9 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardSubtitle,
+  IonList,
+  IonItem,
+  IonSpinner,
 } from '@ionic/vue';
 import { add, addCircleOutline } from 'ionicons/icons';
 import { Ref, computed, inject, provide, ref, toRaw } from 'vue';
@@ -65,6 +70,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperType, Keyboard } from 'swiper';
 
 import LogExerciseModal from '@/components/LogExerciseModal.vue'
+import LogsDayList from '@/components/LogsDayList.vue';
 import { repository } from '@/utils/db';
 import { ExerciseLog } from '@/model/exerciseLog';
 
@@ -74,6 +80,7 @@ const modules = [Keyboard, IonicSlides];
 
 const datesArray: Array<Date> = [];
 const currentDate = new Date();
+const currentDateString = currentDate.toISOString().split("T")[0];
 const daysRange = 10;
 
 for (let i = 0; i < daysRange * 2 + 1; i++) {
@@ -87,20 +94,28 @@ function incrementGroupId() {
   startGroupId.value++;
 }
 provide('groupId', { startGroupId, incrementGroupId });
+const exLogs: Ref<Map<string, ExerciseLog[]> | undefined> = ref();
+const dayLogs: Ref<ExerciseLog[] | undefined> = ref();
+const fetchingLogs = ref(false);
 const updateSliderIdx = (swiper: SwiperType) => {
   sliderActiveIdx.value = swiper.activeIndex;
-  repository.exerciseLogs.getAllDay(datesArray[sliderActiveIdx.value])
+  fetchingLogs.value = true;
+  repository.exerciseLogs.getDaysRange(datesArray[sliderActiveIdx.value])
     .then(data => {
-      const logs = toRaw((data as Ref<Map<string, ExerciseLog>>).value);
-      if (!logs.size) {
+      exLogs.value = (data as Ref<Map<string, ExerciseLog[]>>).value;
+      console.log(exLogs.value);
+      if (!exLogs.value.has(currentDateString)) {
         startGroupId.value = 0;
         return;
       }
-      // sort by groupId
-      var logsAsc = new Map([...logs.entries()].sort((a, b) => a[1].groupId - b[1].groupId));
-      startGroupId.value = Array.from(logsAsc.values()).pop()!.groupId + 1;
-    }).catch(err => {
+      dayLogs.value = exLogs.value.get(currentDateString)!;
+      startGroupId.value = dayLogs.value[dayLogs.value.length-1].groupId + 1;
+    })
+    .catch(err => {
       console.error(err);
+    })
+    .finally(() => {
+      fetchingLogs.value = false;
     });
 };
 

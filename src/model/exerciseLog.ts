@@ -14,9 +14,9 @@ export class ExerciseLog {
     public reps?: number,
     public rpe?: number,
   ) {
-    this.date = date.toString();
+    this.date = date.toISOString();
     this.id = ExerciseLog.build_id(
-      this.date,
+      date,
       this.exercise
     );
   }
@@ -30,7 +30,7 @@ export class ExerciseLog {
       return new this(
         (obj as any).exercise,
         (obj as any).groupId,
-        (obj as any).date,
+        new Date((obj as any).date),
         (obj as any).weight,
         (obj as any).reps,
         (obj as any).rpe,
@@ -41,10 +41,12 @@ export class ExerciseLog {
   }
 
   static build_id(
-    date: string,
+    date: Date,
     exercise: string
   ) {
-    return (date + "_" +
+    // date needs to be like 20230502 to be sortable
+    const dateString = date.toISOString().split("T")[0];
+    return (dateString + "_" +
       exercise + "_" +
       (new Date()).getTime().toString()).replaceAll(" ", "");
   }
