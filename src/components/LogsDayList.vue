@@ -1,7 +1,11 @@
 <template>
   <ion-list>
     <ion-item v-for="[_group, logs] in exGroups">
-          <p v-for="log in logs">{{ log.exercise }}</p>
+      <ion-list>
+        <ion-item v-for="log in logs">
+          <p>{{ log.exercise }}</p>
+        </ion-item>
+      </ion-list>
     </ion-item>
   </ion-list>
 </template>
@@ -13,20 +17,21 @@ import {
 } from '@ionic/vue';
 
 import { ExerciseLog } from '@/model/exerciseLog';
-import { Ref } from 'vue';
+import { Ref, ref, watchEffect } from 'vue';
 
 const props = defineProps<{
   exLogs: Ref<ExerciseLog[]>
 }>();
 
-const exGroups = new Map<number, ExerciseLog[]>();
-for (const log of props.exLogs.value) {
-  if (!(log.groupId in exGroups.keys())) {
-    exGroups.set(log.groupId, [])
+const exGroups: Ref<Map<number, ExerciseLog[]> | undefined> = ref();
+watchEffect(() => {
+  exGroups.value = new Map<number, ExerciseLog[]>();
+
+  for (const log of props.exLogs.value) {
+    if (!exGroups.value.has(log.groupId)) {
+      exGroups.value.set(log.groupId, [])
+    }
+    exGroups.value.get(log.groupId)!.push(log);
   }
-  exGroups.get(log.groupId)!.push(log);
-}
-console.log(exGroups);
-
-
+})
 </script>

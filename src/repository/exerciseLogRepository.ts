@@ -40,9 +40,9 @@ export class ExerciseLogRepository {
     const dateTop = new Date();
     dateTop.setDate(currentDate.getDate() + daysRange);
 
-    if (this.data) {
-      return Promise.resolve(this.data);
-    }
+    // if (this.data) {
+    //   return Promise.resolve(this.data);
+    // }
 
     const dateString1 = dateBottom.toISOString().split("T")[0];
     const dateString2 = dateTop.toISOString().split("T")[0];

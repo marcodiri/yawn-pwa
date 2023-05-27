@@ -10,7 +10,8 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <LogExerciseModal trigger="open-log-ex-modal" :date="datesArray[sliderActiveIdx]" :start-group-id="startGroupId" />
+      <LogExerciseModal trigger="open-log-ex-modal" :date="datesArray[sliderActiveIdx]" :start-group-id="startGroupId"
+        @log-added="updateSliderIdx" />
       <ion-fab id="open-log-ex-modal" class="btn-log-exercise">
         <ion-fab-button>
           <ion-icon :icon="add"></ion-icon>
@@ -29,7 +30,8 @@
           <header>
             <h1>Exercises</h1>
           </header>
-          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" />
+          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])"
+            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" />
           <!-- <ion-spinner v-else-if="fetchingLogs"></ion-spinner> -->
         </swiper-slide>
       </swiper>
@@ -62,7 +64,7 @@ import {
   IonSpinner,
 } from '@ionic/vue';
 import { add, addCircleOutline } from 'ionicons/icons';
-import { Ref, computed, inject, provide, ref, toRaw } from 'vue';
+import { Ref, computed, inject, provide, ref, toRaw, watch } from 'vue';
 
 import 'swiper/css';
 import 'swiper/css/keyboard';
@@ -80,7 +82,6 @@ const modules = [Keyboard, IonicSlides];
 
 const datesArray: Array<Date> = [];
 const currentDate = new Date();
-const currentDateString = currentDate.toISOString().split("T")[0];
 const daysRange = 10;
 
 for (let i = 0; i < daysRange * 2 + 1; i++) {
@@ -95,21 +96,28 @@ function incrementGroupId() {
 }
 provide('groupId', { startGroupId, incrementGroupId });
 const exLogs: Ref<Map<string, ExerciseLog[]> | undefined> = ref();
-const dayLogs: Ref<ExerciseLog[] | undefined> = ref();
+provide('exLogs', exLogs);
 const fetchingLogs = ref(false);
-const updateSliderIdx = (swiper: SwiperType) => {
-  sliderActiveIdx.value = swiper.activeIndex;
+const updateSliderIdx = (swiper?: SwiperType) => {
+  if (swiper) {
+    sliderActiveIdx.value = swiper.activeIndex;
+  }
+  const sliderDate = datesArray[sliderActiveIdx.value];
+  const sliderDateString = sliderDate.toISOString().split("T")[0];
   fetchingLogs.value = true;
-  repository.exerciseLogs.getDaysRange(datesArray[sliderActiveIdx.value])
+  repository.exerciseLogs.getDaysRange(sliderDate)
     .then(data => {
       exLogs.value = (data as Ref<Map<string, ExerciseLog[]>>).value;
       console.log(exLogs.value);
-      if (!exLogs.value.has(currentDateString)) {
+      console.log(`hasday: ${exLogs.value.has(sliderDateString)}`);
+      if (!exLogs.value.has(sliderDateString)) {
         startGroupId.value = 0;
-        return;
       }
-      dayLogs.value = exLogs.value.get(currentDateString)!;
-      startGroupId.value = dayLogs.value[dayLogs.value.length-1].groupId + 1;
+      else {
+        const dayLogs = exLogs.value.get(sliderDateString)!;
+        startGroupId.value = dayLogs[dayLogs.length - 1].groupId + 1;
+      }
+      console.log(`startGroupId: ${startGroupId.value}`);
     })
     .catch(err => {
       console.error(err);
