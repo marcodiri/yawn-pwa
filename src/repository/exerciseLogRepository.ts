@@ -7,14 +7,6 @@ export class ExerciseLogRepository {
 
   constructor(db: PouchDB.RelDatabase) {
     this.db = db;
-
-    this.db
-      .changes({ live: true, since: 'now', include_docs: true })
-      .on('change', (change) => {
-        if (change.id.startsWith('log')) {
-          this.handleChange(change);
-        }
-      });
   }
 
   putList(logs: ExerciseLog[]) {
@@ -71,39 +63,6 @@ export class ExerciseLogRepository {
           reject(error);
         });
     });
-  }
-
-  handleChange(change: PouchDB.Core.ChangesResponseChange<{}>) {
-    let changedKey: number | undefined = undefined;
-    const changeDay = change.id.split("_")[2];
-    const changeId = change.id.split("_").slice(2).join("_");
-
-    if (this.data?.value.has(changeDay)) {
-      this.data.value.get(changeDay)!.forEach((log, key) => {
-        if (log.id === changeId) {
-          changedKey = key;
-        }
-      });
-    }
-    else {
-      this.data!.value.set(changeDay, []);
-    }
-
-    //A document was deleted
-    if (change.deleted) {
-      this.data!.value.get(changeDay)!.splice(changedKey!, 1);
-    } else {
-      //A document was updated
-      if (changedKey) {
-        this.data!.value.get(changeDay!)![changedKey] = ExerciseLog.from_obj((change.doc! as any).data);
-      }
-      //A document was added
-      else {
-        const ex = ExerciseLog.from_obj((change.doc! as any).data);
-        this.data!.value.get(changeDay!)!.push(ex);
-      }
-      this.sortDataByGroupId();
-    }
   }
 
   private sortDataByGroupId() {
