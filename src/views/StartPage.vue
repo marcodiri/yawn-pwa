@@ -6,6 +6,7 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ sliderDate }}</ion-title>
+        <ion-progress-bar v-if="fetchingLogs" type="indeterminate"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 
@@ -32,7 +33,6 @@
           </header>
           <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])"
             :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" />
-          <!-- <ion-spinner v-else-if="fetchingLogs"></ion-spinner> -->
         </swiper-slide>
       </swiper>
     </ion-content>
@@ -56,12 +56,7 @@ import {
   IonFabButton,
   IonCard,
   IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonList,
-  IonItem,
-  IonSpinner,
+  IonProgressBar,
 } from '@ionic/vue';
 import { add, addCircleOutline } from 'ionicons/icons';
 import { Ref, computed, inject, provide, ref, toRaw, watch } from 'vue';
