@@ -1,5 +1,5 @@
 <template>
-  <ion-card v-for="[_group, logs] in exGroups" class="card-logs">
+  <ion-card v-for="[group, logs] in exGroups" class="card-logs">
     <ion-card-header>
       <ion-card-subtitle>
         {{ exList.get(logs[0].exercise)!.name }}
@@ -20,10 +20,10 @@
         </ion-row>
         <LogEntry v-for="log, idx in logs" :log="ref(log)" :idx="idx + 1" />
       </ion-grid>
-      <span>
-        <ion-icon :icon="add"></ion-icon>
-        ADD SET
-      </span>
+      <ion-button class="btn-add-set ion-text-uppercase" expand="block" size="small" color="light" @click="addSet(group, logs)">
+        <ion-icon slot="start" :icon="add"></ion-icon>
+        Add set
+      </ion-button>
     </ion-card-content>
   </ion-card>
 </template>
@@ -47,8 +47,10 @@ import { ExerciseLog } from '@/model/exerciseLog';
 import LogEntry from './LogEntry.vue';
 import { Ref, inject, ref, watchEffect } from 'vue';
 import { Exercise } from '@/model/exercise';
+import { repository } from '@/utils/db';
 
 const props = defineProps<{
+  date: Date
   exLogs: Ref<ExerciseLog[]>
 }>();
 
@@ -65,6 +67,21 @@ watchEffect(() => {
     exGroups.value.get(log.groupId)!.push(log);
   }
 })
+
+const addSet = (group: number, groupLogs: ExerciseLog[]) => {
+  const newLog = new ExerciseLog(
+    groupLogs[0].exercise,
+    group,
+    props.date
+  );
+  repository.exerciseLogs.put(newLog)
+    .then(() => {
+      exGroups.value!.get(group)!.push(newLog);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
 </script>
 
 <style scoped>
@@ -89,6 +106,11 @@ ion-card-subtitle {
 .btn-log-menu::part(native) {
   --padding-start: 0;
   --padding-end: 0;
+}
+
+.btn-add-set {
+  margin: 0;
+  margin-top: 12px;
 }
 
 ion-grid {

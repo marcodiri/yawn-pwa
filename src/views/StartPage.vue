@@ -6,19 +6,19 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ sliderDate }}</ion-title>
-        <ion-progress-bar v-if="fetchingLogs" type="indeterminate"></ion-progress-bar>
+        <ion-progress-bar v-if="fetchingLogs && !exLogs?.has(datesArray[sliderActiveIdx]?.toISOString().split('T')[0])" type="indeterminate"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
       <LogExerciseModal trigger="open-log-ex-modal" :date="datesArray[sliderActiveIdx]" :start-group-id="startGroupId"
-        @log-added="updateSliderIdx" />
+        @log-added="loadDayLogs" />
       <ion-fab id="open-log-ex-modal" class="btn-log-exercise">
         <ion-fab-button>
           <ion-icon :icon="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
-      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @slide-change="updateSliderIdx">
+      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @slide-change="loadDayLogs">
         <swiper-slide v-for="date in datesArray">
           <header>
             <h1>Summary</h1>
@@ -31,7 +31,8 @@
           <header>
             <h1>Exercises</h1>
           </header>
-          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])"
+          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" 
+            :date="datesArray[sliderActiveIdx]"
             :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" />
           <span class="bottom-filler"></span>
         </swiper-slide>
@@ -94,7 +95,7 @@ provide('groupId', { startGroupId, incrementGroupId });
 const exLogs: Ref<Map<string, ExerciseLog[]> | undefined> = ref();
 provide('exLogs', exLogs);
 const fetchingLogs = ref(false);
-const updateSliderIdx = (swiper?: SwiperType) => {
+const loadDayLogs = (swiper?: SwiperType) => {
   if (swiper) {
     sliderActiveIdx.value = swiper.activeIndex;
   }
@@ -104,8 +105,8 @@ const updateSliderIdx = (swiper?: SwiperType) => {
   repository.exerciseLogs.getDaysRange(sliderDate)
     .then(data => {
       exLogs.value = (data as Ref<Map<string, ExerciseLog[]>>).value;
-      console.log(exLogs.value);
-      console.log(`hasday: ${exLogs.value.has(sliderDateString)}`);
+      // console.log(exLogs.value);
+      // console.log(`hasday: ${exLogs.value.has(sliderDateString)}`);
       if (!exLogs.value.has(sliderDateString)) {
         startGroupId.value = 0;
       }
@@ -113,7 +114,7 @@ const updateSliderIdx = (swiper?: SwiperType) => {
         const dayLogs = exLogs.value.get(sliderDateString)!;
         startGroupId.value = dayLogs[dayLogs.length - 1].groupId + 1;
       }
-      console.log(`startGroupId: ${startGroupId.value}`);
+      // console.log(`startGroupId: ${startGroupId.value}`);
     })
     .catch(err => {
       console.error(err);
