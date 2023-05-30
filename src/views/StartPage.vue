@@ -33,6 +33,7 @@
           </header>
           <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])"
             :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" />
+          <span class="bottom-filler"></span>
         </swiper-slide>
       </swiper>
     </ion-content>
@@ -145,6 +146,7 @@ h1 {
 
 .swiper-slide {
   padding-inline: 16px;
+  overflow-y: auto;
 }
 
 .no-logs {
@@ -164,5 +166,11 @@ h1 {
 .card-summary {
   margin-top: 0;
   margin-inline: 0;
+}
+
+.bottom-filler {
+  display: block;
+  width: 100%;
+  height: 64px;
 }
 </style>
