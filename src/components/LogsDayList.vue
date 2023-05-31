@@ -16,9 +16,9 @@
           <ion-col size="2">Set</ion-col>
           <ion-col offset="2">Kg</ion-col>
           <ion-col>Reps</ion-col>
-          <ion-col size="1"></ion-col>
+          <ion-col size="2"></ion-col>
         </ion-row>
-        <LogEntry v-for="log, idx in logs" :log="ref(log)" :idx="idx + 1" />
+        <LogEntry v-for="log, idx in logs" :log="log" :idx="idx + 1" />
       </ion-grid>
       <ion-button class="btn-add-set ion-text-uppercase" expand="block" size="small" color="light" @click="addSet(group, logs)">
         <ion-icon slot="start" :icon="add"></ion-icon>
