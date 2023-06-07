@@ -28,23 +28,23 @@
 
 <script setup lang="ts">
 import {
-  IonGrid,
   IonRow,
   IonCol,
   IonInput,
-  IonButton,
-  IonIcon
+  IonButton
 } from '@ionic/vue';
-import { checkmark } from 'ionicons/icons';
 import { ExerciseLog } from '@/model/exerciseLog';
-import { Ref, inject, ref, toRaw, watch } from 'vue';
+import { Ref, ref } from 'vue';
 import { repository } from '@/utils/db';
-import { Exercise } from '@/model/exercise';
 
 const props = defineProps<{
   log: ExerciseLog
   idx: number
 }>();
+
+const emit = defineEmits<{
+  (e: 'logDeleted', data: ExerciseLog): void
+}>()
 
 const logWeight: Ref<number | undefined> = ref(props.log.weight);
 const logReps: Ref<number | undefined> = ref(props.log.reps);
@@ -59,6 +59,7 @@ const updateLog = () => {
   props.log.weight = logWeight.value;
   props.log.reps = logReps.value;
 
+  // first get from db cause we need rev to update
   repository.exerciseLogs.get(props.log.id)
     .then(function (res) {
       const newLog = ExerciseLog.from_obj(res.logs[0]);
@@ -76,11 +77,26 @@ const updateLog = () => {
       console.error(err);
     });
 
-
   updateRowVisibility(false);
 }
 
 const deleteLog = () => {
+  // first get from db cause we need rev to delete
+  repository.exerciseLogs.get(props.log.id)
+    .then(function (res) {
+      repository.exerciseLogs.remove({id: res.logs[0].id, rev: res.logs[0].rev})
+        .then((r) => {
+          console.log(r);
+          emit('logDeleted', props.log)
+        })
+        .catch((err) => {
+          throw err;
+        });
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+
   updateRowVisibility(false);
 }
 

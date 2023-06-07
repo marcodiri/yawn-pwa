@@ -17,7 +17,8 @@
           <ion-col offset="3">Kg</ion-col>
           <ion-col>Reps</ion-col>
         </ion-row>
-        <LogEntry v-for="log, idx in logs" :log="log" :idx="idx + 1" />
+        <LogEntry v-for="log, idx in logs" :log="log" :idx="idx + 1"
+        @log-deleted="(retLog)=>$emit('logDeleted', retLog)" />
       </ion-grid>
       <ion-button class="btn-add-set ion-text-uppercase" expand="block" size="small" color="light" @click="addSet(group, logs)">
         <ion-icon slot="start" :icon="add"></ion-icon>
@@ -52,6 +53,10 @@ const props = defineProps<{
   date: Date
   exLogs: Ref<ExerciseLog[]>
 }>();
+
+const emit = defineEmits<{
+  (e: 'logDeleted', data: ExerciseLog): void
+}>()
 
 const exList: Ref<Map<string, Exercise>> = inject('exercisesList')!;
 

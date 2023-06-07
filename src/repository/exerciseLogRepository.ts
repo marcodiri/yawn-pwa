@@ -24,13 +24,15 @@ export class ExerciseLogRepository {
     return this.db.rel.save('log', log);
   }
 
+  remove(logId: any) {
+    return this.db.rel.del('log', logId);
+  }
+
   get(logId: string) {
     return this.db.rel.find('log', logId);
   }
 
   getDaysRange(currentDate: Date) {
-    console.log('asdasd');
-    
     // fetch logs from 7 days before current to 7 days after
     const daysRange = 7;
     const dateBottom = new Date();

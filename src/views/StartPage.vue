@@ -33,7 +33,8 @@
           </header>
           <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" 
             :date="datesArray[sliderActiveIdx]"
-            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" />
+            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)"
+            @log-deleted="loadDayLogs()" />
           <span class="bottom-filler"></span>
         </swiper-slide>
       </swiper>
@@ -92,8 +93,10 @@ function incrementGroupId() {
   startGroupId.value++;
 }
 provide('groupId', { startGroupId, incrementGroupId });
+
 const exLogs: Ref<Map<string, ExerciseLog[]> | undefined> = ref();
 provide('exLogs', exLogs);
+
 const fetchingLogs = ref(false);
 const loadDayLogs = (swiper?: SwiperType) => {
   if (swiper) {
