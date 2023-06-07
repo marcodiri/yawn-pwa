@@ -34,7 +34,11 @@ const exList: Ref<Map<string, Exercise> | undefined> = ref();
 
 repository.exercises.putList(defaultExercises)
   .catch((err) => {
-    console.error(err.message);
+    if (err.status === 409) { // conflict
+      console.log("Default exercises already present");
+    } else {
+      console.error(err);
+    }
   })
   .finally(() => {
     repository.exercises.getAll().then(data => {
