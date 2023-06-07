@@ -37,7 +37,9 @@ import {
 } from '@ionic/vue';
 import { checkmark } from 'ionicons/icons';
 import { ExerciseLog } from '@/model/exerciseLog';
-import { Ref, ref, watch } from 'vue';
+import { Ref, inject, ref, toRaw, watch } from 'vue';
+import { repository } from '@/utils/db';
+import { Exercise } from '@/model/exercise';
 
 const props = defineProps<{
   log: ExerciseLog
@@ -53,6 +55,28 @@ const updateRowVisibility = (visible: boolean) => {
 }
 
 const updateLog = () => {
+  // update log
+  props.log.weight = logWeight.value;
+  props.log.reps = logReps.value;
+
+  repository.exerciseLogs.get(props.log.id)
+    .then(function (res) {
+      const newLog = ExerciseLog.from_obj(res.logs[0]);
+      newLog.weight = logWeight.value;
+      newLog.reps = logReps.value;
+      repository.exerciseLogs.put(newLog)
+        .then(() => {
+          console.log("log updated");
+        })
+        .catch((err) => {
+          throw err;
+        });
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+
+
   updateRowVisibility(false);
 }
 

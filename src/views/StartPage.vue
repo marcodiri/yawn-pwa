@@ -105,7 +105,7 @@ const loadDayLogs = (swiper?: SwiperType) => {
   repository.exerciseLogs.getDaysRange(sliderDate)
     .then(data => {
       exLogs.value = (data as Ref<Map<string, ExerciseLog[]>>).value;
-      // console.log(exLogs.value);
+      console.log(exLogs.value);
       // console.log(`hasday: ${exLogs.value.has(sliderDateString)}`);
       if (!exLogs.value.has(sliderDateString)) {
         startGroupId.value = 0;

@@ -13,12 +13,17 @@ export class ExerciseLog {
     public weight?: number,
     public reps?: number,
     public rpe?: number,
+    id?: string,
+    public rev?: string,
   ) {
     this.date = date.toISOString();
-    this.id = ExerciseLog.build_id(
-      date,
-      this.exercise
-    );
+    if (id) this.id = id;
+    else {
+      this.id = ExerciseLog.build_id(
+        date,
+        this.exercise
+      );
+    }
   }
 
   static from_obj(obj: Object) {
@@ -34,6 +39,8 @@ export class ExerciseLog {
         (obj as any).weight,
         (obj as any).reps,
         (obj as any).rpe,
+        (obj as any).id,
+        (obj as any).rev,
       );
     } else {
       throw new TypeError("obj should have the same properties as ExerciseLog");
