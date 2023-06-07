@@ -6,17 +6,19 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ sliderDate }}</ion-title>
+        <ion-progress-bar v-if="fetchingLogs && !exLogs?.has(datesArray[sliderActiveIdx]?.toISOString().split('T')[0])" type="indeterminate"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <LogExerciseModal trigger="open-log-ex-modal" :date="datesArray[sliderActiveIdx]" :start-group-id="startGroupId" />
+      <LogExerciseModal trigger="open-log-ex-modal" :date="datesArray[sliderActiveIdx]" :start-group-id="startGroupId"
+        @log-added="loadDayLogs" />
       <ion-fab id="open-log-ex-modal" class="btn-log-exercise">
         <ion-fab-button>
           <ion-icon :icon="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
-      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @slide-change="updateSliderIdx">
+      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @slide-change="loadDayLogs">
         <swiper-slide v-for="date in datesArray">
           <header>
             <h1>Summary</h1>
@@ -29,6 +31,11 @@
           <header>
             <h1>Exercises</h1>
           </header>
+          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" 
+            :date="datesArray[sliderActiveIdx]"
+            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)"
+            @log-deleted="loadDayLogs()" />
+          <span class="bottom-filler"></span>
         </swiper-slide>
       </swiper>
     </ion-content>
@@ -52,12 +59,10 @@ import {
   IonFabButton,
   IonCard,
   IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
+  IonProgressBar,
 } from '@ionic/vue';
 import { add, addCircleOutline } from 'ionicons/icons';
-import { Ref, computed, inject, provide, ref, toRaw } from 'vue';
+import { Ref, computed, inject, provide, ref, toRaw, watch } from 'vue';
 
 import 'swiper/css';
 import 'swiper/css/keyboard';
@@ -65,6 +70,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperType, Keyboard } from 'swiper';
 
 import LogExerciseModal from '@/components/LogExerciseModal.vue'
+import LogsDayList from '@/components/LogsDayList.vue';
 import { repository } from '@/utils/db';
 import { ExerciseLog } from '@/model/exerciseLog';
 
@@ -87,20 +93,37 @@ function incrementGroupId() {
   startGroupId.value++;
 }
 provide('groupId', { startGroupId, incrementGroupId });
-const updateSliderIdx = (swiper: SwiperType) => {
-  sliderActiveIdx.value = swiper.activeIndex;
-  repository.exerciseLogs.getAllDay(datesArray[sliderActiveIdx.value])
+
+const exLogs: Ref<Map<string, ExerciseLog[]> | undefined> = ref();
+provide('exLogs', exLogs);
+
+const fetchingLogs = ref(false);
+const loadDayLogs = (swiper?: SwiperType) => {
+  if (swiper) {
+    sliderActiveIdx.value = swiper.activeIndex;
+  }
+  const sliderDate = datesArray[sliderActiveIdx.value];
+  const sliderDateString = sliderDate.toISOString().split("T")[0];
+  fetchingLogs.value = true;
+  repository.exerciseLogs.getDaysRange(sliderDate)
     .then(data => {
-      const logs = toRaw((data as Ref<Map<string, ExerciseLog>>).value);
-      if (!logs.size) {
+      exLogs.value = (data as Ref<Map<string, ExerciseLog[]>>).value;
+      console.log(exLogs.value);
+      // console.log(`hasday: ${exLogs.value.has(sliderDateString)}`);
+      if (!exLogs.value.has(sliderDateString)) {
         startGroupId.value = 0;
-        return;
       }
-      // sort by groupId
-      var logsAsc = new Map([...logs.entries()].sort((a, b) => a[1].groupId - b[1].groupId));
-      startGroupId.value = Array.from(logsAsc.values()).pop()!.groupId + 1;
-    }).catch(err => {
+      else {
+        const dayLogs = exLogs.value.get(sliderDateString)!;
+        startGroupId.value = dayLogs[dayLogs.length - 1].groupId + 1;
+      }
+      // console.log(`startGroupId: ${startGroupId.value}`);
+    })
+    .catch(err => {
       console.error(err);
+    })
+    .finally(() => {
+      fetchingLogs.value = false;
     });
 };
 
@@ -127,6 +150,7 @@ h1 {
 
 .swiper-slide {
   padding-inline: 16px;
+  overflow-y: auto;
 }
 
 .no-logs {
@@ -146,5 +170,11 @@ h1 {
 .card-summary {
   margin-top: 0;
   margin-inline: 0;
+}
+
+.bottom-filler {
+  display: block;
+  width: 100%;
+  height: 64px;
 }
 </style>

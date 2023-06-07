@@ -20,12 +20,12 @@ yawtDB.setSchema([
     singular: 'log',
     plural: 'logs',
     relations: {
-      exercise: { belongsTo: 'exercise' }
+      exercise: { belongsTo: { type: 'exercise', options: { async: true } } }
     }
   },
 ]);
 
 export namespace repository {
-  export const exercises= new ExerciseRepository(yawtDB);
+  export const exercises = new ExerciseRepository(yawtDB);
   export const exerciseLogs = new ExerciseLogRepository(yawtDB);
 }

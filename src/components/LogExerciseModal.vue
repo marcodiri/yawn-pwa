@@ -55,9 +55,12 @@ const props = defineProps<{
   date: Date
   presentingElement?: HTMLElement
 }>()
+const emit = defineEmits<{
+  (e: 'logAdded'): void
+}>()
 
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
-const {startGroupId, incrementGroupId} = inject('groupId');
+const {startGroupId, incrementGroupId} = inject('groupId') as any;
 
 const insertingLogInDB = ref(new Array(exList.value?.size).fill(false));
 
@@ -70,8 +73,8 @@ const createLog = (idx: number, exercise: Exercise) => {
   );
   repository.exerciseLogs.put(log)
     .then(() => {
-      console.log(log);
       incrementGroupId();
+      emit('logAdded');
     })
     .catch((err) => {
       console.log(err);
