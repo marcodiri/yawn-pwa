@@ -14,9 +14,8 @@
       <ion-grid>
         <ion-row class="ion-text-uppercase">
           <ion-col size="2">Set</ion-col>
-          <ion-col offset="2">Kg</ion-col>
+          <ion-col offset="3">Kg</ion-col>
           <ion-col>Reps</ion-col>
-          <ion-col size="2"></ion-col>
         </ion-row>
         <LogEntry v-for="log, idx in logs" :log="log" :idx="idx + 1" />
       </ion-grid>

@@ -5,18 +5,23 @@
         {{ idx }}
       </div>
     </ion-col>
-    <ion-col offset="2">
-      <ion-input class="input-number" type="number" placeholder="0" v-model="logWeight" required>
+    <ion-col offset="3">
+      <ion-input class="input-number" type="number" placeholder="0" v-model="logWeight" required
+        @ion-focus="updateRowVisibility(true)">
       </ion-input>
     </ion-col>
     <ion-col>
-      <ion-input class="input-number" type="number" placeholder="0" v-model="logReps" required>
+      <ion-input class="input-number" type="number" placeholder="0" v-model="logReps" required
+        @ion-focus="updateRowVisibility(true)">
       </ion-input>
     </ion-col>
-    <ion-col size="2">
-      <ion-button class="btn-confirm-set ion-no-margin" size="small" color="medium">
-        <ion-icon slot="icon-only" :icon="checkmark"></ion-icon>
-      </ion-button>
+  </ion-row>
+  <ion-row class="update-row" v-show="showUpdateRow">
+    <ion-col>
+      <ion-button size="small" color="success" @click="updateLog">Update</ion-button>
+    </ion-col>
+    <ion-col>
+      <ion-button size="small" color="danger" @click="deleteLog">Delete</ion-button>
     </ion-col>
   </ion-row>
 </template>
@@ -41,6 +46,19 @@ const props = defineProps<{
 
 const logWeight: Ref<number | undefined> = ref(props.log.weight);
 const logReps: Ref<number | undefined> = ref(props.log.reps);
+const showUpdateRow = ref(false);
+
+const updateRowVisibility = (visible: boolean) => {
+  showUpdateRow.value = visible;
+}
+
+const updateLog = () => {
+  updateRowVisibility(false);
+}
+
+const deleteLog = () => {
+  updateRowVisibility(false);
+}
 
 </script>
 
@@ -50,7 +68,7 @@ const logReps: Ref<number | undefined> = ref(props.log.reps);
 }
 
 .set-container {
-  padding-top: 4px;
+  height: 26px;
   font-weight: bold;
 }
 
@@ -61,22 +79,27 @@ ion-col {
 
 ion-col:first-child {
   padding-left: 0;
+  align-content: end;
 }
 
 ion-col:last-child {
   padding-right: 0;
-  text-align: right;
+  /* justify-content: end; */
 }
 
 ion-input.input-number {
   max-width: 50px;
   min-height: 0;
-  /* height: 100%; */
 }
 
 .btn-confirm-set {
   width: 40px;
   height: 30px;
   font-size: 10px;
+}
+
+.update-row ion-button {
+  width: 100%;
+  font-size: 16px;
 }
 </style>
