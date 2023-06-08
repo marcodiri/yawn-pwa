@@ -90,7 +90,7 @@ const addSet = (group: number, groupLogs: ExerciseLog[]) => {
 
 <style scoped>
 .card-logs {
-  margin-top: 0;
+  margin-top: 6px;
   margin-inline: 0;
 }
 
