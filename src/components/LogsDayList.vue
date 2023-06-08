@@ -4,10 +4,10 @@
       <ion-card-subtitle>
         {{ exList.get(logs[0].exercise)!.name }}
       </ion-card-subtitle>
-      <!-- <ion-icon :icon="ellipsisVertical"></ion-icon> -->
 
-      <ion-button class="btn-log-menu" fill="clear" size="small" color="medium">
-        <ion-icon slot="icon-only" :icon="ellipsisVertical"></ion-icon>
+      <ion-button class="btn-log-menu" fill="clear" size="small" color="medium"
+        @click="$router.push({ name: 'ExerciseInfo', params: { id: exList.get(logs[0].exercise)!.id } })">
+        <ion-icon slot="icon-only" :icon="newspaperOutline"></ion-icon>
       </ion-button>
     </ion-card-header>
     <ion-card-content>
@@ -18,9 +18,10 @@
           <ion-col>Reps</ion-col>
         </ion-row>
         <LogEntry v-for="log, idx in logs" :log="log" :idx="idx + 1"
-        @log-deleted="(retLog)=>$emit('logDeleted', retLog)" />
+          @log-deleted="(retLog) => $emit('logDeleted', retLog)" />
       </ion-grid>
-      <ion-button class="btn-add-set ion-text-uppercase" expand="block" size="small" color="light" @click="addSet(group, logs)">
+      <ion-button class="btn-add-set ion-text-uppercase" expand="block" size="small" color="light"
+        @click="addSet(group, logs)">
         <ion-icon slot="start" :icon="add"></ion-icon>
         Add set
       </ion-button>
@@ -30,8 +31,6 @@
 
 <script setup lang="ts">
 import {
-  IonList,
-  IonItem,
   IonCard,
   IonCardHeader,
   IonCardSubtitle,
@@ -42,7 +41,7 @@ import {
   IonButton,
   IonIcon
 } from '@ionic/vue';
-import { add, ellipsisVertical } from 'ionicons/icons';
+import { add, newspaperOutline } from 'ionicons/icons';
 import { ExerciseLog } from '@/model/exerciseLog';
 import LogEntry from './LogEntry.vue';
 import { Ref, inject, ref, watchEffect } from 'vue';
