@@ -61,8 +61,8 @@ const updateLog = () => {
 
   // first get from db cause we need rev to update
   repository.exerciseLogs.get(props.log.id)
-    .then(function (res) {
-      const newLog = ExerciseLog.from_obj(res.logs[0]);
+    .then((log) => {
+      const newLog = log as ExerciseLog;
       newLog.weight = logWeight.value;
       newLog.reps = logReps.value;
       repository.exerciseLogs.put(newLog)
@@ -83,8 +83,9 @@ const updateLog = () => {
 const deleteLog = () => {
   // first get from db cause we need rev to delete
   repository.exerciseLogs.get(props.log.id)
-    .then(function (res) {
-      repository.exerciseLogs.remove({id: res.logs[0].id, rev: res.logs[0].rev})
+    .then((res) => {
+      const log = res as ExerciseLog;
+      repository.exerciseLogs.remove({ id: log.id, rev: log.rev })
         .then((r) => {
           console.log(r);
           emit('logDeleted', props.log)

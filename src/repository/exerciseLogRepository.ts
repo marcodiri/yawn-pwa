@@ -28,8 +28,32 @@ export class ExerciseLogRepository {
     return this.db.rel.del('log', logId);
   }
 
-  get(logId: string) {
-    return this.db.rel.find('log', logId);
+  get(logId: string | string[] | object) {
+    return new Promise((resolve, reject) => {
+      this.db.rel.find('log', logId)
+        .then(res => {
+          resolve(ExerciseLog.from_obj(res.logs[0]));
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  getByExerciseId(exId: string) {
+    return new Promise((resolve, reject) => {
+      const logList: ExerciseLog[] = [];
+      this.db.rel.findHasMany('log', 'exercise', exId)
+        .then(res => {
+          for (const log of res.logs) {
+            logList.push(ExerciseLog.from_obj(log));
+          }
+          resolve(logList);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
   }
 
   getDaysRange(currentDate: Date) {
