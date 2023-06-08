@@ -52,8 +52,6 @@ import {
   IonButtons,
   IonMenuButton,
   IonicSlides,
-  IonLabel,
-  IonButton,
   IonIcon,
   IonFab,
   IonFabButton,
@@ -61,8 +59,8 @@ import {
   IonCardContent,
   IonProgressBar,
 } from '@ionic/vue';
-import { add, addCircleOutline } from 'ionicons/icons';
-import { Ref, computed, inject, provide, ref, toRaw, watch } from 'vue';
+import { add } from 'ionicons/icons';
+import { Ref, computed, inject, provide, ref } from 'vue';
 
 import 'swiper/css';
 import 'swiper/css/keyboard';
