@@ -36,7 +36,7 @@
           </ion-card>
         </swiper-slide>
         <swiper-slide>
-          <ion-card v-for="[date, logs] in logsPerDate">
+          <ion-card v-for="[date, logs] in [...logsPerDate.entries()].reverse()">
             <ion-card-header>
               <ion-card-subtitle>
                 {{ (new Date(date)).toUTCString().split(' ').slice(0, 4).join(' ') }}
