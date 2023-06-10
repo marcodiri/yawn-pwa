@@ -11,8 +11,8 @@ export class ExerciseLog {
     public exercise: string,
     public groupId: number,
     date: Date,
-    public weight?: number,
-    public reps?: number,
+    public weight: number = 0,
+    public reps: number = 0,
     public rpe?: number,
     id?: string,
     public rev?: string,
@@ -31,7 +31,7 @@ export class ExerciseLog {
     if (this.weight && (this.reps || 0) < 15) {
       return ExerciseLog.brzycki1RM(this.weight!, this.reps!)
     }
-    return undefined;
+    return 0;
   }
 
   static from_obj(obj: Object) {

@@ -46,8 +46,8 @@ const emit = defineEmits<{
   (e: 'logDeleted', data: ExerciseLog): void
 }>()
 
-const logWeight: Ref<number | undefined> = ref(props.log.weight);
-const logReps: Ref<number | undefined> = ref(props.log.reps);
+const logWeight: Ref<number> = ref(props.log.weight);
+const logReps: Ref<number> = ref(props.log.reps);
 const showUpdateRow = ref(false);
 
 const updateRowVisibility = (visible: boolean) => {
