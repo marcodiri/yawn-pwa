@@ -2,7 +2,7 @@
   <ion-card v-for="[group, logs] in exGroups" class="card-logs">
     <ion-card-header>
       <ion-card-subtitle>
-        {{ exList.get(logs[0].exercise)!.name }}
+        {{ exList?.get(logs[0].exercise)!.name }}
       </ion-card-subtitle>
 
       <ion-button class="btn-log-menu" fill="clear" size="small" color="medium"

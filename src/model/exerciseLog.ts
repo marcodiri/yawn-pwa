@@ -28,7 +28,7 @@ export class ExerciseLog {
   }
 
   get orm() {
-    if (this.weight && (this.reps || 0) < 15) {
+    if (this.weight && (this.reps || 0) < 16) {
       return ExerciseLog.brzycki1RM(this.weight!, this.reps!)
     }
     return 0;
