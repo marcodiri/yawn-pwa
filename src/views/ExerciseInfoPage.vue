@@ -36,6 +36,11 @@
           </ion-card>
         </swiper-slide>
         <swiper-slide>
+          <ion-card v-if="!logsPerDate.size">
+            <ion-card-content>
+              <span class="no-logs">This exercise has no logs</span>
+            </ion-card-content>
+          </ion-card>
           <ion-card v-for="[date, logs] in [...logsPerDate.entries()].reverse()">
             <ion-card-header>
               <ion-card-subtitle>

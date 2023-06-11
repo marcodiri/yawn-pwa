@@ -1,8 +1,26 @@
 <template>
-  <Line :data="data" :options="options" />
+  <div style="display: flex; flex-flow: column; height: 100%;">
+    <div style="padding-top: 4px;">
+      <ion-item>
+        <ion-select aria-label="graph data" interface="popover" justify="start" label="Data:" v-model="chartDataChoice">
+          <ion-select-option v-for="v in ChartDataChoices" :value="v">
+            {{ v }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+    <div style="position: relative; flex-grow: 1;">
+      <Line :data="chartDataMap.get(chartDataChoice)" :options="options" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import {
+  IonItem,
+  IonSelect,
+  IonSelectOption
+} from '@ionic/vue';
 import { Ref, inject, reactive, ref, watch, watchEffect } from 'vue';
 import {
   Chart as ChartJS,
@@ -31,33 +49,61 @@ const props = defineProps<{
   logsPerDate: Ref<Map<string, ExerciseLog[]>>
 }>();
 
-const data: any = ref({
-  labels: [],
-  datasets: [
-    {
-      label: 'Data One',
-      backgroundColor: '#f87979',
-      data: []
-    }
-  ]
-})
+enum ChartDataChoices {
+  orm = "1RM KGS",
+  volume = "Volume"
+}
+
+const chartDataChoice = ref(ChartDataChoices.orm);
 
 const options = {
   responsive: true,
-  maintainAspectRatio: true
+  maintainAspectRatio: false,
+  layout: {
+    padding: {
+      top: 20,
+    }
+  },
+  elements: {
+    point: {
+      radius: 4
+    }
+  },
+  plugins: {
+    legend: {
+      display: false,
+      onClick: () => { } // disable hide chart
+    }
+  }
 }
 
-type chartData = {
+const emptyData: any = {
+  labels: [],
+  datasets: [
+    {
+      label: 'Empty',
+      backgroundColor: '#3dc2ff',
+      data: []
+    }
+  ]
+};
+
+const chartDataMap = new Map([
+  [ChartDataChoices.orm, emptyData],
+  [ChartDataChoices.volume, emptyData]
+]);
+
+type dataStore = {
   dates: string[],
   values: number[]
 };
 
 watchEffect(() => {
-  const orms: chartData = {
+  const orms: dataStore = {
     dates: [],
     values: []
   };
-  const volume: chartData = {
+  const volume: dataStore = {
     dates: [],
     values: []
   };
@@ -82,28 +128,26 @@ watchEffect(() => {
     dayVol = 0;
   }
 
-  const dataOrm = {
+  chartDataMap.set(ChartDataChoices.orm, {
     labels: orms.dates,
     datasets: [
       {
-        label: '1RM KGS',
+        label: ChartDataChoices.orm,
         backgroundColor: '#3dc2ff',
         data: orms.values
       }
     ]
-  }
+  });
 
-  const dataVolume = {
+  chartDataMap.set(ChartDataChoices.volume, {
     labels: volume.dates,
     datasets: [
       {
-        label: 'Volume',
+        label: ChartDataChoices.volume,
         backgroundColor: '#3dc2ff',
         data: volume.values
       }
     ]
-  }
-
-  data.value = dataVolume;
+  });
 })
 </script>
