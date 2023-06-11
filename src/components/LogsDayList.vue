@@ -101,8 +101,8 @@ ion-card-subtitle {
   position: absolute;
   right: 16px;
   top: 16px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   margin: 0;
 }
 
