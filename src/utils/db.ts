@@ -12,9 +12,9 @@ yawtDB.setSchema([
   {
     singular: 'exercise',
     plural: 'exercises',
-    relations: {
-      logs: { hasMany: 'log' }
-    }
+    // relations: {
+    //   logs: { hasMany: 'log' }
+    // }
   },
   {
     singular: 'log',
@@ -24,6 +24,8 @@ yawtDB.setSchema([
     }
   },
 ]);
+
+yawtDB.createIndex({index: { fields: ['data.exercise', '_id'] }});
 
 export namespace repository {
   export const exercises = new ExerciseRepository(yawtDB);

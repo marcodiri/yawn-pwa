@@ -20,17 +20,17 @@
       </ion-fab>
       <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @slide-change="loadDayLogs">
         <swiper-slide v-for="date in datesArray">
-          <header>
+          <!-- <header>
             <h1>Summary</h1>
+          </header> -->
+          <header>
+            <h1>Exercises</h1>
           </header>
-          <ion-card class="card-summary">
+          <ion-card v-if="!exLogs?.has(date.toISOString().split('T')[0])" class="card-summary">
             <ion-card-content>
               <span class="no-logs">No logs yet</span>
             </ion-card-content>
           </ion-card>
-          <header>
-            <h1>Exercises</h1>
-          </header>
           <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" 
             :date="datesArray[sliderActiveIdx]"
             :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)"
@@ -52,8 +52,6 @@ import {
   IonButtons,
   IonMenuButton,
   IonicSlides,
-  IonLabel,
-  IonButton,
   IonIcon,
   IonFab,
   IonFabButton,
@@ -61,8 +59,8 @@ import {
   IonCardContent,
   IonProgressBar,
 } from '@ionic/vue';
-import { add, addCircleOutline } from 'ionicons/icons';
-import { Ref, computed, inject, provide, ref, toRaw, watch } from 'vue';
+import { add } from 'ionicons/icons';
+import { Ref, computed, inject, provide, ref } from 'vue';
 
 import 'swiper/css';
 import 'swiper/css/keyboard';
@@ -136,7 +134,7 @@ const sliderDate = computed(() => {
 
 <style scoped>
 header {
-  margin: 20px 0 6px 0;
+  margin-top: 20px;
 }
 
 h1 {
@@ -168,7 +166,7 @@ h1 {
 }
 
 .card-summary {
-  margin-top: 0;
+  margin-top: 6px;
   margin-inline: 0;
 }
 

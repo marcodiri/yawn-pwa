@@ -18,7 +18,8 @@
       <AddExerciseModal trigger="open-modal" :presenting-element="presentingElement" @confirm="addExerciseToDb" />
 
       <ion-list>
-        <ion-item button v-for="[key, ex] in exList" class="list-item" lines="full" @click="showExerciseInfo(key)">
+        <ion-item button v-for="[key, ex] in exList" class="list-item" lines="full"
+          @click="$router.push({ name: 'ExerciseInfo', params: { id: ex.id } })">
           <ion-label>{{ ex.name }}</ion-label>
         </ion-item>
       </ion-list>
@@ -46,11 +47,10 @@ import {
   addSharp,
   addOutline
 } from 'ionicons/icons';
-import { Ref, inject, onMounted, ref, toRaw } from 'vue';
+import { Ref, inject, onMounted, ref } from 'vue';
 
 import { Exercise } from '@/model/exercise';
 import AddExerciseModal from '@/components/AddExerciseModal.vue';
-import { useRouter } from 'vue-router';
 import { repository } from '@/utils/db';
 
 const pageTitle = inject('pageTitle');
@@ -62,12 +62,6 @@ onMounted(() => { presentingElement = page.value!["$el"] });
 
 function addExerciseToDb(newExercise: Exercise) {
   repository.exercises.put(newExercise);
-}
-
-const router = useRouter();
-function showExerciseInfo(key: string) {
-  const exClicked = toRaw(exList.value!.get(key));
-  router.push({ name: 'ExerciseInfo', params: { id: exClicked!.id } });
 }
 </script>
 

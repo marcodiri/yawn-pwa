@@ -5,13 +5,14 @@
 export class ExerciseLog {
   public id: string;
   public date: string;
+  private __orm?: number;
 
   constructor(
     public exercise: string,
     public groupId: number,
     date: Date,
-    public weight?: number,
-    public reps?: number,
+    public weight: number = 0,
+    public reps: number = 0,
     public rpe?: number,
     id?: string,
     public rev?: string,
@@ -24,6 +25,13 @@ export class ExerciseLog {
         this.exercise
       );
     }
+  }
+
+  get orm() {
+    if (this.weight && (this.reps || 0) < 16) {
+      return ExerciseLog.brzycki1RM(this.weight!, this.reps!)
+    }
+    return 0;
   }
 
   static from_obj(obj: Object) {
@@ -56,5 +64,10 @@ export class ExerciseLog {
     return (dateString + "_" +
       exercise + "_" +
       (new Date()).getTime().toString()).replaceAll(" ", "");
+  }
+
+  static brzycki1RM(weight: number, reps: number) {
+    const orm = weight * (36 / (37 - reps));
+    return Math.round((orm + Number.EPSILON) * 100) / 100
   }
 };
