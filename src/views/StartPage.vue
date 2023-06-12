@@ -5,8 +5,20 @@
         <ion-buttons slot="start">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>{{ sliderDate }}</ion-title>
-        <ion-progress-bar v-if="fetchingLogs && !exLogs?.has(datesArray[sliderActiveIdx]?.toISOString().split('T')[0])" type="indeterminate"></ion-progress-bar>
+        <ion-title>
+          <!-- {{ sliderDate }} -->
+          <ion-datetime-button datetime="datetime"></ion-datetime-button>
+        </ion-title>
+        <!-- <ion-buttons slot="end">
+          <ion-button>
+            <ion-icon slot="icon-only" :icon="calendarOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons> -->
+        <ion-modal :keep-contents-mounted="true">
+          <ion-datetime id="datetime" presentation="date" :first-day-of-week="1" :value="sliderDate"></ion-datetime>
+        </ion-modal>
+        <ion-progress-bar v-if="fetchingLogs && !exLogs?.has(datesArray[sliderActiveIdx]?.toISOString().split('T')[0])"
+          type="indeterminate"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 
@@ -31,10 +43,8 @@
               <span class="no-logs">No logs yet</span>
             </ion-card-content>
           </ion-card>
-          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" 
-            :date="datesArray[sliderActiveIdx]"
-            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)"
-            @log-deleted="loadDayLogs()" />
+          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" :date="datesArray[sliderActiveIdx]"
+            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" @log-deleted="loadDayLogs()" />
           <span class="bottom-filler"></span>
         </swiper-slide>
       </swiper>
@@ -50,6 +60,7 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
+  IonButton,
   IonMenuButton,
   IonicSlides,
   IonIcon,
@@ -58,8 +69,14 @@ import {
   IonCard,
   IonCardContent,
   IonProgressBar,
+  IonDatetimeButton,
+  IonModal,
+  IonDatetime
 } from '@ionic/vue';
-import { add } from 'ionicons/icons';
+import {
+  add,
+  calendarOutline
+} from 'ionicons/icons';
 import { Ref, computed, inject, provide, ref } from 'vue';
 
 import 'swiper/css';
@@ -126,8 +143,7 @@ const loadDayLogs = (swiper?: SwiperType) => {
 };
 
 const sliderDate = computed(() => {
-  const splits = datesArray[sliderActiveIdx.value].toDateString().split(" ");
-  return splits[0] + ", " + splits[1] + " " + splits[2];
+  return datesArray[sliderActiveIdx.value].toISOString();
 })
 
 </script>
