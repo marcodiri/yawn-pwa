@@ -19,19 +19,19 @@
           @ion-input="removeInvalid"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-select aria-label="record-type" label="Type *" interface="action-sheet" label-placement="floating"
+        <ion-select aria-label="record-type" label="Type *" label-placement="floating"
           v-model="exRcrd">
           <ion-select-option v-for="rcrd in Exercise.RecordType" :value="rcrd">{{ rcrd }}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item>
-        <ion-select aria-label="equipment" label="Equipment *" interface="action-sheet" label-placement="floating"
+        <ion-select aria-label="equipment" label="Equipment *" label-placement="floating"
           v-model="exEqpm">
           <ion-select-option v-for="eqpm in Exercise.Equipment" :value="eqpm">{{ eqpm }}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item>
-        <ion-select aria-label="muscle-target" label="Target Muscle *" interface="action-sheet" label-placement="floating"
+        <ion-select aria-label="muscle-target" label="Target Muscle *" label-placement="floating"
           v-model="exMsclP">
           <ion-select-option v-for="mscl in Exercise.MuscleGroup" :value="mscl">{{ mscl }}</ion-select-option>
         </ion-select>

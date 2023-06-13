@@ -4,22 +4,27 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/plan/current'
+    redirect: '/start'
   },
   {
-    path: '/plan/:page',
-    name: 'Plan',
-    component: () => import ('@/views/PlanPage.vue')
+    path: '/start',
+    name: 'Start',
+    component: () => import('@/views/StartPage.vue')
   },
   {
     path: '/exercises',
     name: 'Exercises',
-    component: () => import ('@/views/ExercisesPage.vue')
+    component: () => import('@/views/ExercisesPage.vue')
   },
   {
     path: '/exercises/:id',
     name: 'ExerciseInfo',
-    component: () => import ('@/views/ExerciseInfoPage.vue')
+    component: () => import('@/views/ExerciseInfoPage.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFoundPage.vue')
   },
 ]
 

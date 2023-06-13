@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>Exercises</ion-title>
+        <ion-title>{{ pageTitle }}</ion-title>
         <ion-buttons slot="end">
           <ion-button id="open-modal">
             <ion-icon aria-hidden="true" :ios="addOutline" :md="addSharp"></ion-icon>
@@ -18,7 +18,8 @@
       <AddExerciseModal trigger="open-modal" :presenting-element="presentingElement" @confirm="addExerciseToDb" />
 
       <ion-list>
-        <ion-item button v-for="[key, ex] in exList" class="list-item" lines="full" @click="showExerciseInfo(key)">
+        <ion-item button v-for="[key, ex] in exList" class="list-item" lines="full"
+          @click="$router.push({ name: 'ExerciseInfo', params: { id: ex.id } })">
           <ion-label>{{ ex.name }}</ion-label>
         </ion-item>
       </ion-list>
@@ -46,14 +47,13 @@ import {
   addSharp,
   addOutline
 } from 'ionicons/icons';
-import { Ref, inject, onMounted, ref, toRaw } from 'vue';
+import { Ref, inject, onMounted, ref } from 'vue';
 
 import { Exercise } from '@/model/exercise';
-import { ExerciseRepository } from '@/repository/exerciseRepository';
 import AddExerciseModal from '@/components/AddExerciseModal.vue';
-import { useRouter } from 'vue-router';
+import { repository } from '@/utils/db';
 
-const repoEx: ExerciseRepository = inject('repoExercises')!;
+const pageTitle = inject('pageTitle');
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
 
 const page = ref(null);
@@ -61,13 +61,7 @@ let presentingElement: HTMLElement;
 onMounted(() => { presentingElement = page.value!["$el"] });
 
 function addExerciseToDb(newExercise: Exercise) {
-  repoEx.put(newExercise);
-}
-
-const router = useRouter();
-function showExerciseInfo(key: string) {
-  const exClicked = toRaw(exList.value!.get(key));
-  router.push({ name: 'ExerciseInfo', params: { id: exClicked!.id } });
+  repository.exercises.put(newExercise);
 }
 </script>
 
