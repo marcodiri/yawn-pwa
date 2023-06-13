@@ -59,9 +59,9 @@ export class ExerciseLogRepository {
   getDaysRange(currentDate: Date) {
     // fetch logs from 7 days before current to 7 days after
     const daysRange = 7;
-    const dateBottom = new Date();
+    const dateBottom = new Date(currentDate.toISOString());
     dateBottom.setDate(currentDate.getDate() - daysRange);
-    const dateTop = new Date();
+    const dateTop = new Date(currentDate.toISOString());
     dateTop.setDate(currentDate.getDate() + daysRange);
 
     // if (this.data) {
