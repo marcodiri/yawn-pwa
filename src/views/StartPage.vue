@@ -5,20 +5,38 @@
         <ion-buttons slot="start">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>{{ sliderDate }}</ion-title>
-        <ion-progress-bar v-if="fetchingLogs && !exLogs?.has(datesArray[sliderActiveIdx]?.toISOString().split('T')[0])" type="indeterminate"></ion-progress-bar>
+        <ion-title>
+          <ion-button id="open-date-picker">
+            {{ currentDate.toUTCString().split(" ").slice(0, 3).join(" ") }}
+          </ion-button>
+          <!-- <ion-datetime-button datetime="datetime"></ion-datetime-button> -->
+        </ion-title>
+        <!-- <ion-buttons slot="end">
+          <ion-button id="open-date-picker">
+            <ion-icon slot="icon-only" :icon="calendarOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons> -->
+        <ion-modal id="modal-datepicker" class="ion-datetime-button-overlay" :keep-contents-mounted="true"
+          trigger="open-date-picker" @willPresent="updateDatepickerValue">
+          <ion-datetime ref="datepicker" id="datetime" presentation="date" :first-day-of-week="1"
+            :highlighted-dates="highlightedDates" :key="ionDatetimeKey"
+            @ion-change="(e) => { datePickerChange(new Date(e.detail.value as string), e) }"></ion-datetime>
+        </ion-modal>
+        <ion-progress-bar v-if="fetchingLogs && !exLogs?.has(currentDate?.toISOString().split('T')[0])"
+          type="indeterminate"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <LogExerciseModal trigger="open-log-ex-modal" :date="datesArray[sliderActiveIdx]" :start-group-id="startGroupId"
-        @log-added="loadDayLogs" />
+      <LogExerciseModal trigger="open-log-ex-modal" :date="currentDate" :start-group-id="startGroupId"
+        @log-added="loadDayLogs(currentDate)" />
       <ion-fab id="open-log-ex-modal" class="btn-log-exercise">
         <ion-fab-button>
           <ion-icon :icon="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
-      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150" @slide-change="loadDayLogs">
+      <swiper :modules="modules" :keyboard="true" :initial-slide="daysRange" :speed="150"
+        @init="(sw) => { swiperRef = sw }" @slide-change="swiperChange">
         <swiper-slide v-for="date in datesArray">
           <!-- <header>
             <h1>Summary</h1>
@@ -31,10 +49,8 @@
               <span class="no-logs">No logs yet</span>
             </ion-card-content>
           </ion-card>
-          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" 
-            :date="datesArray[sliderActiveIdx]"
-            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)"
-            @log-deleted="loadDayLogs()" />
+          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" :date="date"
+            :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" @log-deleted="loadDayLogs(currentDate)" />
           <span class="bottom-filler"></span>
         </swiper-slide>
       </swiper>
@@ -50,6 +66,7 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
+  IonButton,
   IonMenuButton,
   IonicSlides,
   IonIcon,
@@ -58,8 +75,15 @@ import {
   IonCard,
   IonCardContent,
   IonProgressBar,
+  IonDatetimeButton,
+  IonModal,
+  IonDatetime
 } from '@ionic/vue';
-import { add } from 'ionicons/icons';
+import { ModalCustomEvent, DatetimeCustomEvent } from '@ionic/core';
+import {
+  add,
+  calendarOutline
+} from 'ionicons/icons';
 import { Ref, computed, inject, provide, ref } from 'vue';
 
 import 'swiper/css';
@@ -76,16 +100,12 @@ const pageTitle = inject('pageTitle');
 
 const modules = [Keyboard, IonicSlides];
 
-const datesArray: Array<Date> = [];
-const currentDate = new Date();
-const daysRange = 10;
+const ionDatetimeKey = ref(0); // vue will refresh the component when changed
 
-for (let i = 0; i < daysRange * 2 + 1; i++) {
-  datesArray[i] = new Date();
-  datesArray[i].setDate(currentDate.getDate() + i - daysRange);
-}
+const datesArray: Ref<Array<Date>> = ref([]);
+let currentDate = ref(new Date());
+const daysRange = 7;
 
-const sliderActiveIdx = ref(daysRange);
 const startGroupId = ref(0);
 function incrementGroupId() {
   startGroupId.value++;
@@ -95,15 +115,12 @@ provide('groupId', { startGroupId, incrementGroupId });
 const exLogs: Ref<Map<string, ExerciseLog[]> | undefined> = ref();
 provide('exLogs', exLogs);
 
+let logIds: Set<string> = new Set();
 const fetchingLogs = ref(false);
-const loadDayLogs = (swiper?: SwiperType) => {
-  if (swiper) {
-    sliderActiveIdx.value = swiper.activeIndex;
-  }
-  const sliderDate = datesArray[sliderActiveIdx.value];
-  const sliderDateString = sliderDate.toISOString().split("T")[0];
+const loadDayLogs = (day: Date) => {
+  const sliderDateString = day.toISOString().split("T")[0];
   fetchingLogs.value = true;
-  repository.exerciseLogs.getDaysRange(sliderDate)
+  repository.exerciseLogs.getDaysRange(day)
     .then(data => {
       exLogs.value = (data as Ref<Map<string, ExerciseLog[]>>).value;
       console.log(exLogs.value);
@@ -123,13 +140,65 @@ const loadDayLogs = (swiper?: SwiperType) => {
     .finally(() => {
       fetchingLogs.value = false;
     });
+
+  repository.exerciseLogs.getAllIds()
+    .then(res => {
+      logIds.clear();
+      for (const log of res.rows) {
+        logIds.add(log.id.split("_")[2]);
+      }
+      // ionDatetimeKey.value += 1;
+    })
+    .catch(err => {
+      console.error(err);
+    })
 };
 
-const sliderDate = computed(() => {
-  const splits = datesArray[sliderActiveIdx.value].toDateString().split(" ");
-  return splits[0] + ", " + splits[1] + " " + splits[2];
-})
+const swiperRef: Ref<SwiperType | undefined> = ref();
 
+function datePickerChange(selectedDate: Date, e?: DatetimeCustomEvent) {
+  swiperRef.value?.setProgress(0.5); // reset swiper to middle slide
+
+  currentDate.value = selectedDate;
+
+  for (let i = 0; i < daysRange * 2 + 1; i++) {
+    datesArray.value[i] = new Date(selectedDate.toISOString());
+    datesArray.value[i].setDate(selectedDate.getDate() + i - daysRange);
+  }
+
+  loadDayLogs(selectedDate);
+
+  const popoverOrModal = e?.target.closest('ion-modal, ion-popover') as
+    | HTMLIonModalElement
+    | HTMLIonPopoverElement
+    | null;
+  if (popoverOrModal) {
+    popoverOrModal.dismiss();
+  }
+}
+datePickerChange(currentDate.value);
+
+
+function updateDatepickerValue(e: ModalCustomEvent) {
+  e.target.querySelector('ion-datetime')!.value = currentDate.value?.toISOString();
+}
+
+function swiperChange(swiper: SwiperType) {
+  if (datesArray.value.length) {
+    currentDate.value = datesArray.value[swiper.activeIndex];
+  }
+}
+
+function highlightedDates(isoString: string) {
+  if (logIds.has(isoString)) {
+    return {
+      textColor: '#09721b',
+      backgroundColor: '#c8e5d0'
+    };
+  }
+
+  return undefined;
+}
 </script>
 
 <style scoped>
@@ -140,6 +209,15 @@ header {
 h1 {
   margin: 0;
   font-size: 1em;
+}
+
+#open-date-picker::part(native) {
+  background-color: #d9d9d9;
+  height: 80%;
+  border-radius: 8px;
+  color: black;
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 .swiper {
