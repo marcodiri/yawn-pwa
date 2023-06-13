@@ -7,7 +7,7 @@
         </ion-buttons>
         <ion-title>
           <ion-button id="open-date-picker">
-            {{ currentDate.toUTCString().split(" ").slice(0, 3).join(" ") }}
+            {{ currentDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) }}
           </ion-button>
           <!-- <ion-datetime-button datetime="datetime"></ion-datetime-button> -->
         </ion-title>
@@ -212,11 +212,14 @@ h1 {
 }
 
 #open-date-picker::part(native) {
-  background-color: #d9d9d9;
-  height: 80%;
+  background-color: var(--ion-color-step-300, #d9d9d9);
+  --background-activated: var(--ion-color-step-250, #cccccc);
+  width: 220px;
+  height: 70%;
+  margin-top: 8px;
   border-radius: 8px;
-  color: black;
-  margin-top: 5px;
+  background: var(--ion-color-step-300, #edeef0);
+  color: var(--ion-text-color, #000);
   font-weight: bold;
 }
 
