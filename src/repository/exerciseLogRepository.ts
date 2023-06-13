@@ -56,6 +56,13 @@ export class ExerciseLogRepository {
     });
   }
 
+  getAllIds() {
+    return this.db.allDocs({
+      startkey: 'log_',
+      endkey: `log_\ufff0`
+    });
+  }
+
   getDaysRange(currentDate: Date) {
     // fetch logs from 7 days before current to 7 days after
     const daysRange = 7;

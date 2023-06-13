@@ -16,9 +16,10 @@
             <ion-icon slot="icon-only" :icon="calendarOutline"></ion-icon>
           </ion-button>
         </ion-buttons> -->
-        <ion-modal id="modal-datepicker" class="ion-datetime-button-overlay" :keep-contents-mounted="true" trigger="open-date-picker"
-          @willPresent="updateDatepickerValue">
+        <ion-modal id="modal-datepicker" class="ion-datetime-button-overlay" :keep-contents-mounted="true"
+          trigger="open-date-picker" @willPresent="updateDatepickerValue">
           <ion-datetime ref="datepicker" id="datetime" presentation="date" :first-day-of-week="1"
+            :highlighted-dates="highlightedDates" :key="ionDatetimeKey"
             @ion-change="(e) => { datePickerChange(new Date(e.detail.value as string), e) }"></ion-datetime>
         </ion-modal>
         <ion-progress-bar v-if="fetchingLogs && !exLogs?.has(currentDate?.toISOString().split('T')[0])"
@@ -99,6 +100,8 @@ const pageTitle = inject('pageTitle');
 
 const modules = [Keyboard, IonicSlides];
 
+const ionDatetimeKey = ref(0); // vue will refresh the component when changed
+
 const datesArray: Ref<Array<Date>> = ref([]);
 let currentDate = ref(new Date());
 const daysRange = 7;
@@ -112,6 +115,7 @@ provide('groupId', { startGroupId, incrementGroupId });
 const exLogs: Ref<Map<string, ExerciseLog[]> | undefined> = ref();
 provide('exLogs', exLogs);
 
+let logIds: Set<string> = new Set();
 const fetchingLogs = ref(false);
 const loadDayLogs = (day: Date) => {
   const sliderDateString = day.toISOString().split("T")[0];
@@ -136,6 +140,18 @@ const loadDayLogs = (day: Date) => {
     .finally(() => {
       fetchingLogs.value = false;
     });
+
+  repository.exerciseLogs.getAllIds()
+    .then(res => {
+      logIds.clear();
+      for (const log of res.rows) {
+        logIds.add(log.id.split("_")[2]);
+      }
+      // ionDatetimeKey.value += 1;
+    })
+    .catch(err => {
+      console.error(err);
+    })
 };
 
 const swiperRef: Ref<SwiperType | undefined> = ref();
@@ -171,6 +187,17 @@ function swiperChange(swiper: SwiperType) {
   if (datesArray.value.length) {
     currentDate.value = datesArray.value[swiper.activeIndex];
   }
+}
+
+function highlightedDates(isoString: string) {
+  if (logIds.has(isoString)) {
+    return {
+      textColor: '#09721b',
+      backgroundColor: '#c8e5d0'
+    };
+  }
+
+  return undefined;
 }
 </script>
 
