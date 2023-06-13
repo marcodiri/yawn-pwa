@@ -16,8 +16,8 @@
             <ion-icon slot="icon-only" :icon="calendarOutline"></ion-icon>
           </ion-button>
         </ion-buttons> -->
-        <ion-modal id="modal-datepicker" class="ion-datetime-button-overlay" :keep-contents-mounted="true" trigger="open-date-picker"
-          @willPresent="updateDatepickerValue">
+        <ion-modal id="modal-datepicker" class="ion-datetime-button-overlay" :keep-contents-mounted="true"
+          trigger="open-date-picker" @willPresent="updateDatepickerValue">
           <ion-datetime ref="datepicker" id="datetime" presentation="date" :first-day-of-week="1"
             :highlighted-dates="highlightedDates" :key="ionDatetimeKey"
             @ion-change="(e) => { datePickerChange(new Date(e.detail.value as string), e) }"></ion-datetime>
@@ -192,8 +192,8 @@ function swiperChange(swiper: SwiperType) {
 function highlightedDates(isoString: string) {
   if (logIds.has(isoString)) {
     return {
-      textColor: 'var(--ion-color-secondary-contrast)',
-      backgroundColor: 'var(--ion-color-secondary)',
+      textColor: '#09721b',
+      backgroundColor: '#c8e5d0'
     };
   }
 
