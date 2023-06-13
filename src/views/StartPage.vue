@@ -6,16 +6,19 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>
-          {{ currentDate }}
-          <ion-datetime-button datetime="datetime"></ion-datetime-button>
+          <ion-button id="open-date-picker">
+            {{ currentDate.toUTCString().split(" ").slice(0, 3).join(" ") }}
+          </ion-button>
+          <!-- <ion-datetime-button datetime="datetime"></ion-datetime-button> -->
         </ion-title>
         <!-- <ion-buttons slot="end">
-          <ion-button>
+          <ion-button id="open-date-picker">
             <ion-icon slot="icon-only" :icon="calendarOutline"></ion-icon>
           </ion-button>
         </ion-buttons> -->
-        <ion-modal :keep-contents-mounted="true">
-          <ion-datetime id="datetime" presentation="date" :first-day-of-week="1" :value="currentDate?.toISOString()"
+        <ion-modal id="modal-datepicker" class="ion-datetime-button-overlay" :keep-contents-mounted="true" trigger="open-date-picker"
+          @willPresent="updateDatepickerValue">
+          <ion-datetime ref="datepicker" id="datetime" presentation="date" :first-day-of-week="1"
             :highlighted-dates="highlightedDates" :key="ionDatetimeKey"
             @ion-change="(e) => { datePickerChange(new Date(e.detail.value as string), e) }"></ion-datetime>
         </ion-modal>
@@ -46,7 +49,7 @@
               <span class="no-logs">No logs yet</span>
             </ion-card-content>
           </ion-card>
-          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" :date="currentDate"
+          <LogsDayList v-if="exLogs?.has(date.toISOString().split('T')[0])" :date="date"
             :ex-logs="ref(exLogs.get(date.toISOString().split('T')[0])!)" @log-deleted="loadDayLogs(currentDate)" />
           <span class="bottom-filler"></span>
         </swiper-slide>
@@ -76,7 +79,7 @@ import {
   IonModal,
   IonDatetime
 } from '@ionic/vue';
-import { DatetimeCustomEvent } from '@ionic/vue';
+import { ModalCustomEvent, DatetimeCustomEvent } from '@ionic/core';
 import {
   add,
   calendarOutline
@@ -175,6 +178,11 @@ function datePickerChange(selectedDate: Date, e?: DatetimeCustomEvent) {
 }
 datePickerChange(currentDate.value);
 
+
+function updateDatepickerValue(e: ModalCustomEvent) {
+  e.target.querySelector('ion-datetime')!.value = currentDate.value?.toISOString();
+}
+
 function swiperChange(swiper: SwiperType) {
   if (datesArray.value.length) {
     currentDate.value = datesArray.value[swiper.activeIndex];
@@ -201,6 +209,15 @@ header {
 h1 {
   margin: 0;
   font-size: 1em;
+}
+
+#open-date-picker::part(native) {
+  background-color: #d9d9d9;
+  height: 80%;
+  border-radius: 8px;
+  color: black;
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 .swiper {
