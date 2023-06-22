@@ -16,9 +16,10 @@
     </ion-header>
     <ion-content :fullscreen="true">
       <AddExerciseModal trigger="open-modal" :presenting-element="presentingElement" @confirm="addExerciseToDb" />
+      <ion-searchbar :debounce="300" @ionInput="filterExercises($event)"></ion-searchbar>
 
       <ion-list>
-        <ion-item button v-for="[key, ex] in exList" class="list-item" lines="full"
+        <ion-item button v-for="[key, ex] in results" class="list-item" lines="full"
           @click="$router.push({ name: 'ExerciseInfo', params: { id: ex.id } })">
           <ion-label>{{ ex.name }}</ion-label>
         </ion-item>
@@ -42,12 +43,14 @@ import {
   IonList,
   IonItem,
   IonLabel,
+  IonSearchbar,
+  SearchbarCustomEvent,
 } from '@ionic/vue';
 import {
   addSharp,
   addOutline
 } from 'ionicons/icons';
-import { Ref, inject, onMounted, ref } from 'vue';
+import { Ref, inject, onMounted, ref, watchEffect } from 'vue';
 
 import { Exercise } from '@/model/exercise';
 import AddExerciseModal from '@/components/AddExerciseModal.vue';
@@ -55,6 +58,11 @@ import { repository } from '@/utils/db';
 
 const pageTitle = inject('pageTitle');
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
+const results = ref(exList.value);
+watchEffect(() => {
+  results.value = exList.value
+})
+
 
 const page = ref(null);
 let presentingElement: HTMLElement;
@@ -62,6 +70,14 @@ onMounted(() => { presentingElement = page.value!["$el"] });
 
 function addExerciseToDb(newExercise: Exercise) {
   repository.exercises.put(newExercise);
+}
+
+function filterExercises(event: SearchbarCustomEvent) {
+  const query = event.target.value!.toLowerCase();
+  results.value = new Map(
+    [...exList.value!]
+      .filter(([k, ex]) => ex.name.toLowerCase().indexOf(query) > -1)
+  );
 }
 </script>
 
