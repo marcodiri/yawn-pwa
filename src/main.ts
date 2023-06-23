@@ -1,4 +1,4 @@
-import { Ref, createApp, ref } from 'vue';
+import { Ref, createApp, readonly, ref } from 'vue';
 import App from './App.vue';
 import router from './router';
 
@@ -48,7 +48,7 @@ repository.exercises.putList(defaultExercises)
     });
   });
 
-app.provide('exercisesList', exList);
+app.provide('exercisesList', readonly(exList));
 
 router.isReady().then(() => {
   app.mount('#app');
