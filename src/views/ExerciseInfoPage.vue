@@ -21,17 +21,32 @@
         :speed="150" @slide-change="slideChanged">
         <swiper-slide>
           <ion-card>
-            <ion-card-header>
-              <ion-card-subtitle>{{ exercise.equipment }}</ion-card-subtitle>
-            </ion-card-header>
             <ion-card-content>
-              <ion-label>
-                Target Muscle: {{ exercise.muscle_primary }}
-              </ion-label>
-              <ion-label v-if="exercise.muscle_secondary.length">
-                <br />
-                Synergists Muscles: {{ exercise.muscle_secondary.join(", ") }}
-              </ion-label>
+              <ion-grid>
+                <ion-row>
+                  <ion-col class="muscle-images">
+                    <span :class="'muscle-image-' + exercise.muscle_primary.toLowerCase()"></span>
+                    <span v-for="muscle in exercise.muscle_secondary"
+                      :class="'muscle-image-' + muscle.toLowerCase()"></span>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="ion-align-items-start ion-justify-content-between">
+                  <ion-col size="auto">
+                    <ion-label>
+                      Target Muscle: {{ exercise.muscle_primary }}
+                    </ion-label>
+                    <ion-label v-if="exercise.muscle_secondary.length">
+                      <br />
+                      Synergists Muscles: {{ exercise.muscle_secondary.join(", ") }}
+                    </ion-label>
+                    <ion-label>
+                      <br />
+                      <br />
+                      Equipment: {{ exercise.equipment }}
+                    </ion-label>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
             </ion-card-content>
           </ion-card>
         </swiper-slide>
@@ -48,7 +63,7 @@
               </ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              <ion-grid>
+              <ion-grid class="grid-history">
                 <ion-row>
                   <ion-col>KGS</ion-col>
                   <ion-col>REPS</ion-col>
@@ -172,7 +187,70 @@ const segmentChange = (e: any) => {
   overflow-y: auto;
 }
 
-ion-grid {
+ion-grid.grid-history {
   text-align: right;
+}
+
+ion-col.muscle-images {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+span[class^='muscle-image-'] {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin-right: 6px;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  background-repeat: no-repeat;
+}
+
+.muscle-image-chest {
+  background-image: url("/muscle_chart/mask/chest.png"), url("/muscle_chart/chart.png");
+  background-position: -28px -23px;
+  background-size: 200px;
+}
+
+.muscle-image-back {
+  background-image: url("/muscle_chart/mask/back.png"), url("/muscle_chart/chart.png");
+  background-position: -96px -18px;
+  background-size: 150px;
+}
+
+.muscle-image-biceps {
+  background-image: url("/muscle_chart/mask/biceps.png"), url("/muscle_chart/chart.png");
+  background-position: -21px -53px;
+  background-size: 280px;
+}
+
+.muscle-image-shoulders {
+  background-image: url("/muscle_chart/mask/shoulders.png"), url("/muscle_chart/chart.png");
+  background-position: -24px -34px;
+  background-size: 280px;
+}
+
+.muscle-image-abs {
+  background-image: url("/muscle_chart/mask/abs.png"), url("/muscle_chart/chart.png");
+  background-position: -26px -39px;
+  background-size: 190px;
+}
+
+.muscle-image-triceps {
+  background-image: url("/muscle_chart/mask/triceps.png"), url("/muscle_chart/chart.png");
+  background-position: -118px -32px;
+  background-size: 200px;
+}
+
+.muscle-image-legs {
+  background-image: url("/muscle_chart/mask/legs.png"), url("/muscle_chart/chart.png");
+  background-position: -22px -89px;
+  background-size: 200px;
+}
+
+.muscle-image-cardio {
+  background-image: url("/muscle_chart/cardio.png");
+  background-position: -13px 5px;
+  background-size: 50px;
 }
 </style>
