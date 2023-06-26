@@ -71,10 +71,10 @@
                 </ion-row>
                 <ion-row v-for="log in logs">
                   <ion-col class="col-number">
-                    {{ log.weight }}
+                    {{ log.weight || 0 }}
                   </ion-col>
                   <ion-col class="col-number">
-                    {{ log.reps }}
+                    {{ log.reps || 0 }}
                   </ion-col>
                   <ion-col>
                     {{ log.orm }}

@@ -4,7 +4,10 @@
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
           <ion-list>
-            <ion-list-header>Menu</ion-list-header>
+            <ion-list-header lines="full" class="menu-title">
+              YAWT
+              <span class="menu-subtitle">Yet Another Workout Tracker</span>
+            </ion-list-header>
             <ion-menu-toggle :auto-hide="false" v-for="[key, page] in appPages" :key="key">
               <ion-item router-direction="root" :router-link="key" lines="none" :detail="false" class="hydrated"
                 :class="{ selected: selectedKey === key }">
@@ -36,23 +39,21 @@ import {
 } from '@ionic/vue';
 import { ref, provide, watch, Ref } from 'vue';
 import {
-  mailOutline,
-  mailSharp,
-  paperPlaneOutline,
-  paperPlaneSharp,
+  newspaperOutline,
+  barbell
 } from 'ionicons/icons';
 import { useRoute } from 'vue-router';
 
 const appPages: Map<string, { [key: string]: string }> = new Map([
   ['/start', {
     title: "Workout Logs",
-    iosIcon: mailOutline,
-    mdIcon: mailSharp,
+    iosIcon: newspaperOutline,
+    mdIcon: newspaperOutline,
   }],
   ['/exercises', {
     title: "Exercises",
-    iosIcon: paperPlaneOutline,
-    mdIcon: paperPlaneSharp,
+    iosIcon: barbell,
+    mdIcon: barbell,
   }],
 ]);
 
@@ -82,11 +83,27 @@ html {
 </style>
 
 <style scoped>
-ion-menu.md ion-item.selected {
+ion-menu ion-item {
+  cursor: pointer;
+}
+
+ion-menu ion-item.selected {
   --background: rgba(var(--ion-color-primary-rgb), 0.14);
 }
 
-ion-menu.md ion-item.selected ion-icon {
+ion-menu ion-item.selected ion-icon {
   color: var(--ion-color-primary);
+}
+
+.menu-title {
+  padding-bottom: 6px;
+  font-size: 28px;
+}
+
+.menu-subtitle {
+  padding-bottom: 4px;
+  padding-left: 4px;
+  font-size: 10px;
+  font-weight: normal;
 }
 </style>

@@ -31,7 +31,8 @@ import {
   IonRow,
   IonCol,
   IonInput,
-  IonButton
+  IonButton,
+  toastController
 } from '@ionic/vue';
 import { ExerciseLog } from '@/model/exerciseLog';
 import { Ref, ref } from 'vue';
@@ -46,8 +47,8 @@ const emit = defineEmits<{
   (e: 'logDeleted', data: ExerciseLog): void
 }>()
 
-const logWeight: Ref<number> = ref(props.log.weight);
-const logReps: Ref<number> = ref(props.log.reps);
+const logWeight: Ref<number | undefined> = ref(props.log.weight);
+const logReps: Ref<number | undefined> = ref(props.log.reps);
 const showUpdateRow = ref(false);
 
 const updateRowVisibility = (visible: boolean) => {
@@ -68,6 +69,7 @@ const updateLog = () => {
       repository.exerciseLogs.put(newLog)
         .then(() => {
           console.log("log updated");
+          presentToast("Log updated");
         })
         .catch((err) => {
           throw err;
@@ -75,8 +77,8 @@ const updateLog = () => {
     })
     .catch((err) => {
       console.error(err);
+      presentToast("There was an error adding the log to database");
     });
-
   updateRowVisibility(false);
 }
 
@@ -88,19 +90,29 @@ const deleteLog = () => {
       repository.exerciseLogs.remove({ id: log.id, rev: log.rev })
         .then((r) => {
           console.log(r);
+          presentToast("Log deleted");
           emit('logDeleted', props.log)
         })
         .catch((err) => {
+          presentToast("There was an error deleting the log");
           throw err;
         });
     })
     .catch((err) => {
       console.error(err);
     });
-
   updateRowVisibility(false);
 }
 
+async function presentToast(msg: string) {
+  const toast = await toastController.create({
+    message: msg,
+    duration: 1500,
+    position: 'bottom',
+  });
+
+  await toast.present();
+}
 </script>
 
 <style scoped>
@@ -120,16 +132,20 @@ ion-col {
 
 ion-col:first-child {
   padding-left: 0;
-  align-content: end;
 }
 
 ion-col:last-child {
   padding-right: 0;
-  /* justify-content: end; */
+}
+
+ion-input {
+  text-align: center;
+  border-radius: 4px;
+  background-color: var(--ion-color-light, #f4f5f8);
 }
 
 ion-input.input-number {
-  max-width: 50px;
+  width: 100%;
   min-height: 0;
 }
 
