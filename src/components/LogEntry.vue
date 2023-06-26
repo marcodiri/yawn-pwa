@@ -77,6 +77,7 @@ const updateLog = () => {
     })
     .catch((err) => {
       console.error(err);
+      presentToast("There was an error adding the log to database");
     });
   updateRowVisibility(false);
 }
@@ -93,6 +94,7 @@ const deleteLog = () => {
           emit('logDeleted', props.log)
         })
         .catch((err) => {
+          presentToast("There was an error deleting the log");
           throw err;
         });
     })
