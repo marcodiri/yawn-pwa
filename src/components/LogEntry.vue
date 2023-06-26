@@ -47,8 +47,8 @@ const emit = defineEmits<{
   (e: 'logDeleted', data: ExerciseLog): void
 }>()
 
-const logWeight: Ref<number> = ref(props.log.weight);
-const logReps: Ref<number> = ref(props.log.reps);
+const logWeight: Ref<number | undefined> = ref(props.log.weight);
+const logReps: Ref<number | undefined> = ref(props.log.reps);
 const showUpdateRow = ref(false);
 
 const updateRowVisibility = (visible: boolean) => {
@@ -132,16 +132,20 @@ ion-col {
 
 ion-col:first-child {
   padding-left: 0;
-  align-content: end;
 }
 
 ion-col:last-child {
   padding-right: 0;
-  /* justify-content: end; */
+}
+
+ion-input {
+  text-align: center;
+  border-radius: 4px;
+  background-color: var(--ion-color-light, #f4f5f8);
 }
 
 ion-input.input-number {
-  max-width: 50px;
+  width: 100%;
   min-height: 0;
 }
 
