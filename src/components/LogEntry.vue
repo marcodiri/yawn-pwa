@@ -31,7 +31,8 @@ import {
   IonRow,
   IonCol,
   IonInput,
-  IonButton
+  IonButton,
+  toastController
 } from '@ionic/vue';
 import { ExerciseLog } from '@/model/exerciseLog';
 import { Ref, ref } from 'vue';
@@ -68,6 +69,7 @@ const updateLog = () => {
       repository.exerciseLogs.put(newLog)
         .then(() => {
           console.log("log updated");
+          presentToast("Log updated");
         })
         .catch((err) => {
           throw err;
@@ -76,7 +78,6 @@ const updateLog = () => {
     .catch((err) => {
       console.error(err);
     });
-
   updateRowVisibility(false);
 }
 
@@ -88,6 +89,7 @@ const deleteLog = () => {
       repository.exerciseLogs.remove({ id: log.id, rev: log.rev })
         .then((r) => {
           console.log(r);
+          presentToast("Log deleted");
           emit('logDeleted', props.log)
         })
         .catch((err) => {
@@ -97,10 +99,18 @@ const deleteLog = () => {
     .catch((err) => {
       console.error(err);
     });
-
   updateRowVisibility(false);
 }
 
+async function presentToast(msg: string) {
+  const toast = await toastController.create({
+    message: msg,
+    duration: 1500,
+    position: 'bottom',
+  });
+
+  await toast.present();
+}
 </script>
 
 <style scoped>
