@@ -15,8 +15,8 @@
           <ion-label>{{ ex.name }}</ion-label>
           <ion-buttons slot="end">
             <ion-button class="btn-add-to-log" aria-label="add-exercise-to-log" @click="createLog(idx, ex)">
-              <ion-icon v-if="!insertingLogInDB[idx]" slot="icon-only" :icon="addCircleOutline"
-                aria-hidden="true"></ion-icon>
+              <ion-icon v-if="!insertingLogInDB[idx]" slot="icon-only" :icon="logIcon[idx]" aria-hidden="true"
+              :class="{ 'text-success': logAdded[idx] }"></ion-icon>
               <ion-spinner v-else></ion-spinner>
             </ion-button>
           </ion-buttons>
@@ -42,8 +42,8 @@ import {
   IonIcon,
   IonSpinner,
 } from '@ionic/vue';
-import { addCircleOutline } from 'ionicons/icons';
-import { Ref, inject, ref, toRaw } from 'vue';
+import { addCircleOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { Ref, inject, ref, watchEffect } from 'vue';
 
 import { attachHistoryListener, dismissModal } from '@/composables/modalBackButton';
 import { repository } from '@/utils/db';
@@ -60,9 +60,16 @@ const emit = defineEmits<{
 }>()
 
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
-const {startGroupId, incrementGroupId} = inject('groupId') as any;
+const { startGroupId, incrementGroupId } = inject('groupId') as any;
 
-const insertingLogInDB = ref(new Array(exList.value?.size).fill(false));
+const insertingLogInDB: Ref<Array<boolean>> = ref([]);
+const logAdded: Ref<Array<boolean>> = ref([]);
+const logIcon: Ref<Array<string>> = ref([]);
+watchEffect(() => {
+  insertingLogInDB.value = new Array(exList.value?.size).fill(false);
+  logAdded.value = new Array(exList.value?.size).fill(false);
+  logIcon.value = new Array(exList.value?.size).fill(addCircleOutline);
+});
 
 const createLog = (idx: number, exercise: Exercise) => {
   insertingLogInDB.value[idx] = true;
@@ -74,6 +81,12 @@ const createLog = (idx: number, exercise: Exercise) => {
   repository.exerciseLogs.put(log)
     .then(() => {
       incrementGroupId();
+      logIcon.value[idx] = checkmarkCircleOutline;
+      logAdded.value[idx] = true;
+      setTimeout(() => {
+        logAdded.value[idx] = false;
+        logIcon.value[idx] = addCircleOutline;
+      }, 800);
       emit('logAdded');
     })
     .catch((err) => {
@@ -98,5 +111,9 @@ const createLog = (idx: number, exercise: Exercise) => {
 
 .btn-add-to-log ion-icon {
   font-size: 28px;
+}
+
+.text-success {
+  color: green;
 }
 </style>
