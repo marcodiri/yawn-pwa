@@ -5,8 +5,8 @@
         <ion-content>
           <ion-list>
             <ion-list-header lines="full" class="menu-title">
-              YAWT
-              <span class="menu-subtitle">Yet Another Workout Tracker</span>
+              YAWN
+              <span class="menu-subtitle">Yet Another Workout Notebook</span>
             </ion-list-header>
             <ion-menu-toggle :auto-hide="false" v-for="[key, page] in appPages" :key="key">
               <ion-item router-direction="root" :router-link="key" lines="none" :detail="false" class="hydrated"
