@@ -113,7 +113,7 @@ watchEffect(() => {
     for (const log of logs) {
       const orm = log.orm;
       if (orm > maxOrm) maxOrm = orm;
-      dayVol += log.weight * log.reps;
+      dayVol += (log.weight || 0) * (log.reps || 0);
     }
     if (maxOrm > 0) {
       orms.dates.push(date);
