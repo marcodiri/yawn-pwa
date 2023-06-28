@@ -10,13 +10,14 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
+      <ExerciseFilter :ex-list="exList" @filter="updateExerciseList" />
       <ion-list>
-        <ion-item v-for="[_key, ex], idx in exList" class="list-item" lines="full">
+        <ion-item v-for="[_key, ex], idx in results" class="list-item" lines="full">
           <ion-label>{{ ex.name }}</ion-label>
           <ion-buttons slot="end">
             <ion-button class="btn-add-to-log" aria-label="add-exercise-to-log" @click="createLog(idx, ex)">
               <ion-icon v-if="!insertingLogInDB[idx]" slot="icon-only" :icon="logIcon[idx]" aria-hidden="true"
-              :class="{ 'text-success': logAdded[idx] }"></ion-icon>
+                :class="{ 'text-success': logAdded[idx] }"></ion-icon>
               <ion-spinner v-else></ion-spinner>
             </ion-button>
           </ion-buttons>
@@ -49,6 +50,7 @@ import { attachHistoryListener, dismissModal } from '@/composables/modalBackButt
 import { repository } from '@/utils/db';
 import { Exercise } from '@/model/exercise';
 import { ExerciseLog } from '@/model/exerciseLog';
+import ExerciseFilter from './ExerciseFilter.vue';
 
 const props = defineProps<{
   trigger: string
@@ -60,6 +62,10 @@ const emit = defineEmits<{
 }>()
 
 const exList: Ref<Map<string, Exercise> | undefined> = inject('exercisesList')!;
+const results = ref(exList.value);
+watchEffect(() => {
+  results.value = exList.value
+})
 const { startGroupId, incrementGroupId } = inject('groupId') as any;
 
 const insertingLogInDB: Ref<Array<boolean>> = ref([]);
@@ -70,6 +76,10 @@ watchEffect(() => {
   logAdded.value = new Array(exList.value?.size).fill(false);
   logIcon.value = new Array(exList.value?.size).fill(addCircleOutline);
 });
+
+function updateExerciseList(filteredExercises: Map<string, Exercise>) {
+  results.value = filteredExercises;
+}
 
 const createLog = (idx: number, exercise: Exercise) => {
   insertingLogInDB.value[idx] = true;
