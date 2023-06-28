@@ -57,7 +57,7 @@ export namespace Exercise {
     Abs = "Abs",
     Back = "Back",
     Biceps = "Biceps",
-    Cardio = "Cardio",
+    // Cardio = "Cardio",
     Chest = "Chest",
     Legs = "Legs",
     Shoulders = "Shoulders",
